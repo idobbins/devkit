@@ -35,7 +35,20 @@ require('packer').startup(function(use)
 
   use {'nvim-lualine/lualine.nvim', requires = {'kyazdani42/nvim-web-devicons', opt = true}}
 
+  use 'klen/nvim-config-local'
+
 end)
+
+require('config-local').setup {
+  -- Default configuration (optional)
+  config_files = { ".vimrc.lua", ".vimrc" },
+  hashfile = vim.fn.stdpath("data") .. "/config-local",
+  autocommands_create = true,
+  commands_create = true,
+  silent = false,
+  lookup_parents = false,
+}
+
 
 local lspconfig = require('lspconfig')
 
@@ -51,7 +64,7 @@ for _, lsp in ipairs(servers) do
   }))
 end
 
--- treesitter
+-- treesitte\
 
 require('nvim-treesitter.configs').setup {
   ensure_installed = "all",
