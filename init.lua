@@ -37,6 +37,8 @@ require('packer').startup(function(use)
 
   use 'klen/nvim-config-local'
 
+  use 'jiangmiao/auto-pairs'
+
 end)
 
 require('config-local').setup {
