@@ -28,6 +28,13 @@ require('packer').startup(function(use)
 
   use 'nvim-treesitter/nvim-treesitter'
 
+  use 'preservim/nerdtree'
+
+  use 'nvim-tree/nvim-web-devicons'
+  use {'romgrk/barbar.nvim', requires = 'nvim-web-devicons'}
+
+  use {'nvim-lualine/lualine.nvim', requires = {'kyazdani42/nvim-web-devicons', opt = true}}
+
 end)
 
 local lspconfig = require('lspconfig')
@@ -55,3 +62,7 @@ require('nvim-treesitter.configs').setup {
     enable = true,
   },
 }
+
+-- lualine
+
+require('lualine').setup()
