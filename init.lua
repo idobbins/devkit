@@ -114,10 +114,10 @@ require('config-local').setup {
 
 -- treesitter
 
-require('nvim-treesitter.configs').setup {
-  ensure_installed = "all",
-
-  auto_install = true,
+require'nvim-treesitter.configs'.setup {
+  ensure_installed = { "c", "cpp", "cmake", "lua", "vim", },
+  sync_install = false,
+  auto_install = false,
 
   highlight = {
     enable = true,
