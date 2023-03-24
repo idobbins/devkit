@@ -18,8 +18,6 @@ require('packer').startup(function(use)
 
   use 'wbthomason/packer.nvim'
 
-  use 'github/copilot.vim'
-
   use 'neovim/nvim-lspconfig'
 
   use 'hrsh7th/nvim-cmp'
