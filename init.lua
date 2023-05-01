@@ -31,8 +31,6 @@ require('packer').startup(function(use)
 
   use 'klen/nvim-config-local'
 
-  use 'jiangmiao/auto-pairs'
-
 end)
 
 -- Add additional capabilities supported by nvim-cmp
