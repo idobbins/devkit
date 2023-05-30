@@ -14,6 +14,12 @@ vim.o.shiftwidth = 2
 vim.o.tabstop = 2
 vim.o.smartindent = true
 vim.o.autoindent = true
+-- vim.opt.termguicolors = true
+vim.o.splitright = true
+
+-- keymaps
+
+vim.api.nvim_set_keymap("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", { noremap = true })
 
 
 -- packer
@@ -43,9 +49,11 @@ require('packer').startup(function(use)
 
   use 'klen/nvim-config-local'
 
-  use 'ggandor/leap.nvim'
-
   use("eandrju/cellular-automaton.nvim")
+
+  use {'krady21/compiler-explorer.nvim'}
+  use {'stevearc/dressing.nvim'}
+  use 'rcarriga/nvim-notify'
 
 end)
 
@@ -61,6 +69,7 @@ vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
 require('telescope').setup {}
 require('telescope').load_extension('fzf')
 
+
 -- lsp
 
 local lspconfig = require('lspconfig')
@@ -69,7 +78,7 @@ local lspconfig = require('lspconfig')
 vim.g.coq_settings = { auto_start = 'shut-up' }
 
 -- Enable some language servers with the additional completion capabilities offered by coq_nvim
-local servers = { 'clangd', 'r_language_server' }
+local servers = { 'clangd', 'rust_analyzer', 'r_language_server', 'jedi_language_server', 'tsserver' }
 
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup(require('coq').lsp_ensure_capabilities({
@@ -87,13 +96,9 @@ require('config-local').setup {
   autocommands_create = true,
   commands_create = true,
   silent = false,
-  lookup_parents = false,
+  lookup_parents = true,
 }
 
-
--- leap
-
-require('leap').add_default_mappings()
 
 -- treesitter
 
@@ -108,6 +113,10 @@ require'nvim-treesitter.configs'.setup {
   },
 }
 
+-- vim.cmd[[colorscheme nord]]
+
 -- lualine
 
-require('lualine').setup()
+require('lualine').setup {}
+
+
