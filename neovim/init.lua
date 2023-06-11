@@ -14,7 +14,7 @@ vim.o.shiftwidth = 2
 vim.o.tabstop = 2
 vim.o.smartindent = true
 vim.o.autoindent = true
--- vim.opt.termguicolors = true
+-- vim.o.termguicolors = true
 vim.o.splitright = true
 
 -- keymaps
@@ -27,6 +27,8 @@ vim.api.nvim_set_keymap("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", 
 require('packer').startup(function(use)
 
   use 'wbthomason/packer.nvim'
+
+  use 'nordtheme/vim'
 
   use {
 	  'nvim-telescope/telescope.nvim', tag = '0.1.0',
@@ -78,7 +80,7 @@ local lspconfig = require('lspconfig')
 vim.g.coq_settings = { auto_start = 'shut-up' }
 
 -- Enable some language servers with the additional completion capabilities offered by coq_nvim
-local servers = { 'clangd', 'rust_analyzer', 'r_language_server', 'jedi_language_server', 'tsserver' }
+local servers = { 'clangd', 'r_language_server', 'tsserver' }
 
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup(require('coq').lsp_ensure_capabilities({
@@ -113,10 +115,10 @@ require'nvim-treesitter.configs'.setup {
   },
 }
 
--- vim.cmd[[colorscheme nord]]
+vim.cmd[[colorscheme nord]]
 
 -- lualine
 
 require('lualine').setup {}
 
-
+vim.cmd('COQnow -s')
