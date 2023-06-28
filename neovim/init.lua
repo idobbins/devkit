@@ -14,7 +14,7 @@ vim.o.shiftwidth = 2
 vim.o.tabstop = 2
 vim.o.smartindent = true
 vim.o.autoindent = true
--- vim.o.termguicolors = true
+--vim.o.termguicolors = true
 vim.o.splitright = true
 
 -- keymaps
@@ -45,15 +45,12 @@ require('packer').startup(function(use)
 
   use({"nvim-treesitter/nvim-treesitter", run = ":TSUpdate"})
 
-  use("tpope/vim-fugitive")
-
   use {'nvim-lualine/lualine.nvim', requires = {'kyazdani42/nvim-web-devicons', opt = true}}
 
   use 'klen/nvim-config-local'
 
-  use("eandrju/cellular-automaton.nvim")
+  use 'mfussenegger/nvim-dap'
 
-  use {'krady21/compiler-explorer.nvim'}
   use {'stevearc/dressing.nvim'}
   use 'rcarriga/nvim-notify'
 
@@ -80,7 +77,7 @@ local lspconfig = require('lspconfig')
 vim.g.coq_settings = { auto_start = 'shut-up' }
 
 -- Enable some language servers with the additional completion capabilities offered by coq_nvim
-local servers = { 'clangd', 'r_language_server', 'tsserver' }
+local servers = { 'clangd', 'tsserver', 'sqlls', 'marksman' }
 
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup(require('coq').lsp_ensure_capabilities({
@@ -115,10 +112,19 @@ require'nvim-treesitter.configs'.setup {
   },
 }
 
+-- dap
+
+local dap = require('dap')
+dap.adapters.lldb = {
+  type = 'executable',
+  command = '/opt/homebrew/Cellar/llvm/16.0.6/bin/lldb-vscode', -- adjust as needed, must be absolute path
+  name = 'lldb'
+}
+
 vim.cmd[[colorscheme nord]]
 
 -- lualine
 
 require('lualine').setup {}
 
-vim.cmd('COQnow -s')
+vim.cmd('COQnow')
