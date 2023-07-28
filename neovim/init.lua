@@ -10,17 +10,20 @@ vim.g.mapleader = " "
 vim.o.syntax = 'on'
 vim.o.number = true
 vim.o.expandtab = true
-vim.o.shiftwidth = 2
-vim.o.tabstop = 2
+vim.o.shiftwidth = 4
+vim.o.tabstop = 4
 vim.o.smartindent = true
 vim.o.autoindent = true
---vim.o.termguicolors = true
+-- vim.o.termguicolors = true
 vim.o.splitright = true
 
 -- keymaps
 
 vim.api.nvim_set_keymap("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", { noremap = true })
 
+vim.api.nvim_set_keymap('n', '<F1>', ':80vsplit <bar> :terminal <CR>', {noremap = true, silent = true})
+
+vim.keymap.set('n', '<leader>fc', vim.lsp.buf.format)
 
 -- packer
 
@@ -29,6 +32,8 @@ require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
 
   use 'nordtheme/vim'
+  use 'ellisonleao/gruvbox.nvim'
+  use { "catppuccin/nvim", as = "catppuccin" }
 
   use {
 	  'nvim-telescope/telescope.nvim', tag = '0.1.0',
@@ -36,24 +41,47 @@ require('packer').startup(function(use)
   }
 
   use {'nvim-telescope/telescope-fzf-native.nvim', run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build' }
+    
+  use({
+        "folke/trouble.nvim",
+        config = function()
+            require("trouble").setup {
+                icons = false,
+            }
+        end
+  })
 
-  use 'neovim/nvim-lspconfig'
+  use {
+	  'VonHeikemen/lsp-zero.nvim',
+	  branch = 'v1.x',
+	  requires = {
+		  -- LSP Support
+		  {'neovim/nvim-lspconfig'},
+		  {'williamboman/mason.nvim'},
+		  {'williamboman/mason-lspconfig.nvim'},
 
-  use {'ms-jpq/coq_nvim', branch = 'coq'}
-  use {'ms-jpq/coq.artifacts', branch = 'artifacts'}
-  use {'ms-jpq/coq.thirdparty', branch = '3p'}
+		  -- Autocompletion
+		  {'hrsh7th/nvim-cmp'},
+		  {'hrsh7th/cmp-buffer'},
+		  {'hrsh7th/cmp-path'},
+		  {'saadparwaiz1/cmp_luasnip'},
+		  {'hrsh7th/cmp-nvim-lsp'},
+		  {'hrsh7th/cmp-nvim-lua'},
+
+		  -- Snippets
+		  {'L3MON4D3/LuaSnip'},
+		  {'rafamadriz/friendly-snippets'},
+	  }
+  }
+
 
   use({"nvim-treesitter/nvim-treesitter", run = ":TSUpdate"})
 
   use {'nvim-lualine/lualine.nvim', requires = {'kyazdani42/nvim-web-devicons', opt = true}}
 
   use 'klen/nvim-config-local'
-
-  use 'mfussenegger/nvim-dap'
-
-  use {'stevearc/dressing.nvim'}
+  use 'stevearc/dressing.nvim'
   use 'rcarriga/nvim-notify'
-
 end)
 
 
@@ -65,25 +93,69 @@ vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
 vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
 vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
 
+
 require('telescope').setup {}
 require('telescope').load_extension('fzf')
 
-
 -- lsp
 
-local lspconfig = require('lspconfig')
+local lsp = require("lsp-zero")
 
--- Automatically start coq
-vim.g.coq_settings = { auto_start = 'shut-up' }
+lsp.preset("recommended")
 
--- Enable some language servers with the additional completion capabilities offered by coq_nvim
-local servers = { 'clangd', 'tsserver', 'sqlls', 'marksman' }
+lsp.ensure_installed({
+    'clangd', 'tsserver', 'marksman', 'rust_analyzer', 'lua_ls', 'tailwindcss', 'jedi_language_server'
+})
 
-for _, lsp in ipairs(servers) do
-  lspconfig[lsp].setup(require('coq').lsp_ensure_capabilities({
-    -- on_attach = my_custom_on_attach,
-  }))
-end
+-- Fix Undefined global 'vim'
+lsp.nvim_workspace()
+
+local cmp = require('cmp')
+local cmp_select = {behavior = cmp.SelectBehavior.Select}
+local cmp_mappings = lsp.defaults.cmp_mappings({
+  ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
+  ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
+  ['<C-y>'] = cmp.mapping.confirm({ select = true }),
+  ["<C-Space>"] = cmp.mapping.complete(),
+})
+
+cmp_mappings['<Tab>'] = nil
+cmp_mappings['<S-Tab>'] = nil
+
+lsp.setup_nvim_cmp({
+  mapping = cmp_mappings
+})
+
+lsp.set_preferences({
+    suggest_lsp_servers = false,
+    sign_icons = {
+        error = 'E',
+        warn = 'W',
+        hint = 'H',
+        info = 'I'
+    }
+})
+
+lsp.on_attach(function(client, bufnr)
+  local opts = {buffer = bufnr, remap = false}
+
+  vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
+  vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts)
+  vim.keymap.set("n", "<leader>vws", function() vim.lsp.buf.workspace_symbol() end, opts)
+  vim.keymap.set("n", "<leader>vd", function() vim.diagnostic.open_float() end, opts)
+  vim.keymap.set("n", "[d", function() vim.diagnostic.goto_next() end, opts)
+  vim.keymap.set("n", "]d", function() vim.diagnostic.goto_prev() end, opts)
+  vim.keymap.set("n", "<leader>vca", function() vim.lsp.buf.code_action() end, opts)
+  vim.keymap.set("n", "<leader>vrr", function() vim.lsp.buf.references() end, opts)
+  vim.keymap.set("n", "<leader>vrn", function() vim.lsp.buf.rename() end, opts)
+  vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts)
+end)
+
+lsp.setup()
+
+vim.diagnostic.config({
+    virtual_text = true
+})
 
 
 -- nvim-config-local
@@ -112,19 +184,11 @@ require'nvim-treesitter.configs'.setup {
   },
 }
 
--- dap
+-- theme
+vim.cmd([[colorscheme catppuccin-latte]])
 
-local dap = require('dap')
-dap.adapters.lldb = {
-  type = 'executable',
-  command = '/opt/homebrew/Cellar/llvm/16.0.6/bin/lldb-vscode', -- adjust as needed, must be absolute path
-  name = 'lldb'
-}
-
-vim.cmd[[colorscheme nord]]
 
 -- lualine
 
 require('lualine').setup {}
 
-vim.cmd('COQnow')
