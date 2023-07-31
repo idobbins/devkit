@@ -1,55 +1,31 @@
-
-
--- init.lua
-
-
--- general
-
-vim.g.mapleader = " "
-
-vim.o.syntax = 'on'
-vim.o.number = true
-vim.o.expandtab = true
-vim.o.shiftwidth = 4
-vim.o.tabstop = 4
-vim.o.smartindent = true
-vim.o.autoindent = true
--- vim.o.termguicolors = true
-vim.o.splitright = true
-
--- keymaps
-
-vim.api.nvim_set_keymap("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", { noremap = true })
-
-vim.api.nvim_set_keymap('n', '<F1>', ':80vsplit <bar> :terminal <CR>', {noremap = true, silent = true})
-
-vim.keymap.set('n', '<leader>fc', vim.lsp.buf.format)
-
 -- packer
-
 require('packer').startup(function(use)
-
   use 'wbthomason/packer.nvim'
 
-  use 'nordtheme/vim'
-  use 'ellisonleao/gruvbox.nvim'
-  use { "catppuccin/nvim", as = "catppuccin" }
+  use { 'catppuccin/nvim', as = 'catppuccin' }
 
   use {
 	  'nvim-telescope/telescope.nvim', tag = '0.1.0',
+	  -- or                            , branch = '0.1.x',
 	  requires = { {'nvim-lua/plenary.nvim'} }
   }
 
   use {'nvim-telescope/telescope-fzf-native.nvim', run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build' }
-    
+
   use({
-        "folke/trouble.nvim",
-        config = function()
-            require("trouble").setup {
-                icons = false,
-            }
-        end
+      'folke/trouble.nvim',
+      config = function()
+          require('trouble').setup {
+              icons = false,
+              -- your configuration comes here
+              -- or leave it empty to use the default settings
+              -- refer to the configuration section below
+          }
+      end
   })
+
+  use({'nvim-treesitter/nvim-treesitter', run = ':TSUpdate'})
+  use("nvim-treesitter/nvim-treesitter-context");
 
   use {
 	  'VonHeikemen/lsp-zero.nvim',
@@ -74,16 +50,67 @@ require('packer').startup(function(use)
 	  }
   }
 
-
-  use({"nvim-treesitter/nvim-treesitter", run = ":TSUpdate"})
-
   use {'nvim-lualine/lualine.nvim', requires = {'kyazdani42/nvim-web-devicons', opt = true}}
-
-  use 'klen/nvim-config-local'
-  use 'stevearc/dressing.nvim'
+  use {'stevearc/dressing.nvim'}
   use 'rcarriga/nvim-notify'
+  use 'klen/nvim-config-local'
+
+  use("eandrju/cellular-automaton.nvim")
+
 end)
 
+-- general
+
+vim.g.mapleader = " "
+
+vim.o.syntax = 'on'
+vim.o.number = true
+vim.o.expandtab = true
+vim.o.shiftwidth = 4
+vim.o.tabstop = 4
+vim.o.smartindent = true
+vim.o.autoindent = true
+vim.o.termguicolors = true
+vim.o.splitright = true
+
+vim.cmd.colorscheme 'catppuccin-latte'
+
+-- nvim-config-local
+
+require('config-local').setup {
+  -- Default configuration (optional)
+  config_files = { ".vimrc.lua", ".vimrc" },
+  hashfile = vim.fn.stdpath("data") .. "/config-local",
+  autocommands_create = true,
+  commands_create = true,
+  silent = false,
+  lookup_parents = true,
+}
+
+-- treesitter
+
+require'nvim-treesitter.configs'.setup {
+  -- A list of parser names, or "all"
+  ensure_installed = "all",
+
+  -- Install parsers synchronously (only applied to `ensure_installed`)
+  sync_install = false,
+
+  -- Automatically install missing parsers when entering buffer
+  -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
+  auto_install = true,
+
+  highlight = {
+    -- `false` will disable the whole extension
+    enable = true,
+
+    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+    -- Using this option may slow down your editor, and you may see some duplicate highlights.
+    -- Instead of true it can also be a list of languages
+    additional_vim_regex_highlighting = false,
+  },
+}
 
 -- telescope
 
@@ -92,7 +119,6 @@ local builtin = require('telescope.builtin')
 vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
 vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
 vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
-
 
 require('telescope').setup {}
 require('telescope').load_extension('fzf')
@@ -104,11 +130,24 @@ local lsp = require("lsp-zero")
 lsp.preset("recommended")
 
 lsp.ensure_installed({
-    'clangd', 'tsserver', 'marksman', 'rust_analyzer', 'lua_ls', 'tailwindcss', 'jedi_language_server'
+  'tsserver',
+  'clangd',
+  'pyright',
+  'rust_analyzer',
+  'terraformls',
 })
 
 -- Fix Undefined global 'vim'
-lsp.nvim_workspace()
+lsp.configure('lua-language-server', {
+    settings = {
+        Lua = {
+            diagnostics = {
+                globals = { 'vim' }
+            }
+        }
+    }
+})
+
 
 local cmp = require('cmp')
 local cmp_select = {behavior = cmp.SelectBehavior.Select}
@@ -141,14 +180,14 @@ lsp.on_attach(function(client, bufnr)
 
   vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
   vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts)
-  vim.keymap.set("n", "<leader>vws", function() vim.lsp.buf.workspace_symbol() end, opts)
-  vim.keymap.set("n", "<leader>vd", function() vim.diagnostic.open_float() end, opts)
+  -- vim.keymap.set("n", "<leader>vws", function() vim.lsp.buf.workspace_symbol() end, opts)
+  -- vim.keymap.set("n", "<leader>vd", function() vim.diagnostic.open_float() end, opts)
   vim.keymap.set("n", "[d", function() vim.diagnostic.goto_next() end, opts)
   vim.keymap.set("n", "]d", function() vim.diagnostic.goto_prev() end, opts)
-  vim.keymap.set("n", "<leader>vca", function() vim.lsp.buf.code_action() end, opts)
-  vim.keymap.set("n", "<leader>vrr", function() vim.lsp.buf.references() end, opts)
-  vim.keymap.set("n", "<leader>vrn", function() vim.lsp.buf.rename() end, opts)
-  vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts)
+  -- vim.keymap.set("n", "<leader>vca", function() vim.lsp.buf.code_action() end, opts)
+  -- vim.keymap.set("n", "<leader>vrr", function() vim.lsp.buf.references() end, opts)
+  vim.keymap.set("n", "<leader>rn", function() vim.lsp.buf.rename() end, opts)
+  -- vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts)
 end)
 
 lsp.setup()
@@ -157,38 +196,6 @@ vim.diagnostic.config({
     virtual_text = true
 })
 
-
--- nvim-config-local
-
-require('config-local').setup {
-  -- Default configuration (optional)
-  config_files = { ".vimrc.lua", ".vimrc" },
-  hashfile = vim.fn.stdpath("data") .. "/config-local",
-  autocommands_create = true,
-  commands_create = true,
-  silent = false,
-  lookup_parents = true,
-}
-
-
--- treesitter
-
-require'nvim-treesitter.configs'.setup {
-  ensure_installed = {},
-  sync_install = false,
-  auto_install = true,
-
-  highlight = {
-    enable = true,
-    additional_vim_regex_highlighting = false,
-  },
-}
-
--- theme
-vim.cmd([[colorscheme catppuccin-latte]])
-
-
 -- lualine
 
 require('lualine').setup {}
-
