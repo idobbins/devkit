@@ -75,6 +75,8 @@ vim.o.splitright = true
 
 vim.cmd.colorscheme 'catppuccin-latte'
 
+vim.keymap.set('n', '<leader>m', '<cmd>:marks<CR>', {})
+
 -- nvim-config-local
 
 require('config-local').setup {
@@ -134,7 +136,7 @@ lsp.ensure_installed({
   'clangd',
   'pyright',
   'rust_analyzer',
-  'terraformls',
+  'zls',
 })
 
 -- Fix Undefined global 'vim'
