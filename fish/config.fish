@@ -6,6 +6,7 @@ fish_add_path /opt/homebrew/bin
 
 fish_add_path /Users/idobbins/.yarn/bin
 fish_add_path /Users/idobbins/.cargo/bin
+fish_add_path /Users/idobbins/go/bin
 
 eval (brew shellenv)
 
