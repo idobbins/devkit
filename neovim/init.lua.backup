@@ -2,7 +2,7 @@
 require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
 
-  use 'nordtheme/vim'
+  use { 'catppuccin/nvim', as = 'catppuccin' }
 
   use {
 	  'nvim-telescope/telescope.nvim', tag = '0.1.0',
@@ -11,6 +11,18 @@ require('packer').startup(function(use)
   }
 
   use {'nvim-telescope/telescope-fzf-native.nvim', run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build' }
+
+  use({
+      'folke/trouble.nvim',
+      config = function()
+          require('trouble').setup {
+              icons = false,
+              -- your configuration comes here
+              -- or leave it empty to use the default settings
+              -- refer to the configuration section below
+          }
+      end
+  })
 
   use({'nvim-treesitter/nvim-treesitter', run = ':TSUpdate'})
   use("nvim-treesitter/nvim-treesitter-context");
@@ -43,6 +55,7 @@ require('packer').startup(function(use)
   use 'rcarriga/nvim-notify'
   use 'klen/nvim-config-local'
 
+  use("eandrju/cellular-automaton.nvim")
 
 end)
 
@@ -60,14 +73,15 @@ vim.o.autoindent = true
 vim.o.termguicolors = true
 vim.o.splitright = true
 
-vim.cmd.colorscheme 'nord'
+vim.cmd.colorscheme 'catppuccin-mocha'
 
 vim.keymap.set('n', '<leader>m', '<cmd>:marks<CR>', {})
 
 -- nvim-config-local
 
 require('config-local').setup {
-  config_files = { ".vimrc.lua" },
+  -- Default configuration (optional)
+  config_files = { ".vimrc.lua", ".vimrc" },
   hashfile = vim.fn.stdpath("data") .. "/config-local",
   autocommands_create = true,
   commands_create = true,
@@ -78,13 +92,25 @@ require('config-local').setup {
 -- treesitter
 
 require'nvim-treesitter.configs'.setup {
+  -- A list of parser names, or "all"
   ensure_installed = "all",
-  auto_install = false,
+
+  -- Install parsers synchronously (only applied to `ensure_installed`)
   sync_install = false,
+
+  -- Automatically install missing parsers when entering buffer
+  -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
   auto_install = true,
 
   highlight = {
+    -- `false` will disable the whole extension
     enable = true,
+
+    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+    -- Using this option may slow down your editor, and you may see some duplicate highlights.
+    -- Instead of true it can also be a list of languages
+    additional_vim_regex_highlighting = false,
   },
 }
 
@@ -128,6 +154,7 @@ lsp.configure('lua-language-server', {
 })
 
 require'lspconfig'.millet.setup{}
+
 
 local cmp = require('cmp')
 local cmp_select = {behavior = cmp.SelectBehavior.Select}
