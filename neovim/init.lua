@@ -73,7 +73,7 @@ vim.o.autoindent = true
 vim.o.termguicolors = true
 vim.o.splitright = true
 
-vim.cmd.colorscheme 'catppuccin-latte'
+vim.cmd.colorscheme 'catppuccin-mocha'
 
 vim.keymap.set('n', '<leader>m', '<cmd>:marks<CR>', {})
 
@@ -133,11 +133,13 @@ local lsp = require("lsp-zero")
 lsp.preset("recommended")
 
 lsp.ensure_installed({
-  'tsserver',
+  'bashls',
   'clangd',
+  'gopls',
+  'hls',
   'pyright',
   'rust_analyzer',
-  'bashls',
+  'tsserver',
 })
 
 -- Fix Undefined global 'vim'
@@ -150,6 +152,8 @@ lsp.configure('lua-language-server', {
         }
     }
 })
+
+require'lspconfig'.millet.setup{}
 
 
 local cmp = require('cmp')
