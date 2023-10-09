@@ -2,7 +2,7 @@
 require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
 
-  use 'nordtheme/vim'
+  use { 'catppuccin/nvim', as = 'catppuccin' }
 
   use {
 	  'nvim-telescope/telescope.nvim', tag = '0.1.0',
@@ -60,7 +60,7 @@ vim.o.autoindent = true
 vim.o.termguicolors = true
 vim.o.splitright = true
 
-vim.cmd.colorscheme 'nord'
+vim.cmd.colorscheme 'catppuccin-mocha'
 
 vim.keymap.set('n', '<leader>m', '<cmd>:marks<CR>', {})
 
