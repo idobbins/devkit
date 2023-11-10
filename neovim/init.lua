@@ -42,7 +42,7 @@ require('packer').startup(function(use)
   use {'stevearc/dressing.nvim'}
   use 'rcarriga/nvim-notify'
   use 'klen/nvim-config-local'
-
+  use 'github/copilot.vim'
 
 end)
 
@@ -109,8 +109,7 @@ lsp.preset("recommended")
 lsp.ensure_installed({
   'bashls',
   'clangd',
-  'gopls',
-  'hls',
+  'cmake',
   'pyright',
   'rust_analyzer',
   'tsserver',
