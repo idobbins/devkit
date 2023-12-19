@@ -15,6 +15,14 @@ require('packer').startup(function(use)
   use({'nvim-treesitter/nvim-treesitter', run = ':TSUpdate'})
   use("nvim-treesitter/nvim-treesitter-context");
 
+  use({
+    "kdheepak/lazygit.nvim",
+    -- optional for floating window border decoration
+    requires = {
+        "nvim-lua/plenary.nvim",
+    },
+})
+
   use {
 	  'VonHeikemen/lsp-zero.nvim',
 	  branch = 'v1.x',
@@ -52,6 +60,7 @@ vim.g.mapleader = " "
 
 vim.o.syntax = 'on'
 vim.o.number = true
+vim.o.relativenumber = true
 vim.o.expandtab = true
 vim.o.shiftwidth = 4
 vim.o.tabstop = 4
@@ -110,10 +119,16 @@ lsp.ensure_installed({
   'bashls',
   'clangd',
   'cmake',
+  'csharp_ls',
   'pyright',
   'rust_analyzer',
   'tsserver',
 })
+
+--lsp.configure('clangd', {
+    -- cmd = {'/Users/idobbins/projects/dev/llvm-project/build/bin/clangd'},
+--    filetypes = { 'c', 'cpp', 'cppm', 'objc', 'objcpp' }
+--})
 
 -- Fix Undefined global 'vim'
 lsp.configure('lua-language-server', {
