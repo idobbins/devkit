@@ -2,8 +2,6 @@
 require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
 
-  use { 'catppuccin/nvim', as = 'catppuccin' }
-
   use {
 	  'nvim-telescope/telescope.nvim', tag = '0.1.4',
 	  -- or                            , branch = '0.1.x',
@@ -12,7 +10,7 @@ require('packer').startup(function(use)
 
   use {'nvim-telescope/telescope-fzf-native.nvim', run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build' }
 
-  use({'nvim-treesitter/nvim-treesitter', run = ':TSUpdate'})
+  use({'nvim-treesitter/nvim-treesitter'})
   use("nvim-treesitter/nvim-treesitter-context");
 
   use({
@@ -50,7 +48,18 @@ require('packer').startup(function(use)
   use {'stevearc/dressing.nvim'}
   use 'rcarriga/nvim-notify'
   use 'klen/nvim-config-local'
-  use 'github/copilot.vim'
+    
+  use({
+    "folke/trouble.nvim",
+    config = function()
+        require("trouble").setup {
+            icons = false,
+            -- your configuration comes here
+            -- or leave it empty to use the default settings
+            -- refer to the configuration section below
+        }
+    end
+  })
 
 end)
 
@@ -64,12 +73,13 @@ vim.o.relativenumber = true
 vim.o.expandtab = true
 vim.o.shiftwidth = 4
 vim.o.tabstop = 4
+vim.o.softtabstop = 4
 vim.o.smartindent = true
 vim.o.autoindent = true
 vim.o.termguicolors = true
 vim.o.splitright = true
 
-vim.cmd.colorscheme 'catppuccin-mocha'
+-- vim.cmd.colorscheme 'catppuccin-mocha'
 
 vim.keymap.set('n', '<leader>m', '<cmd>:marks<CR>', {})
 
