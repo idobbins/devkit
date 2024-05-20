@@ -1,70 +1,87 @@
--- packer
-require('packer').startup(function(use)
-  use 'wbthomason/packer.nvim'
+-- Install Lazy.nvim if not already installed
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable", -- latest stable release
+    lazypath,
+  })
+end
+vim.opt.rtp:prepend(lazypath)
 
-  use {
-	  'nvim-telescope/telescope.nvim', tag = '0.1.4',
-	  -- or                            , branch = '0.1.x',
-	  requires = { {'nvim-lua/plenary.nvim'} }
+-- Configure Lazy.nvim
+require('lazy').setup({
+  'kyazdani42/nvim-web-devicons',
+
+  -- Telescope
+  {
+    'nvim-telescope/telescope.nvim', 
+    tag = '0.1.4',
+    dependencies = { 'nvim-lua/plenary.nvim', 'kyazdani42/nvim-web-devicons' },
+  },
+  {
+    'nvim-telescope/telescope-fzf-native.nvim',
+    build = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'
+  },
+
+  -- Treesitter
+  { 'nvim-treesitter/nvim-treesitter'},
+
+  -- Lazygit
+  {
+    'kdheepak/lazygit.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+  },
+
+  -- LSP
+  {
+    'VonHeikemen/lsp-zero.nvim',
+    branch = 'v1.x',
+    dependencies = {
+      -- LSP Support
+      'neovim/nvim-lspconfig',
+      'williamboman/mason.nvim',
+      'williamboman/mason-lspconfig.nvim',
+
+      -- Autocompletion
+      'hrsh7th/nvim-cmp',
+      'hrsh7th/cmp-buffer',
+      'hrsh7th/cmp-path',
+      'saadparwaiz1/cmp_luasnip',
+      'hrsh7th/cmp-nvim-lsp',
+      'hrsh7th/cmp-nvim-lua',
+
+      -- Snippets
+      'L3MON4D3/LuaSnip',
+      'rafamadriz/friendly-snippets',
+    }
+  },
+
+  -- Lualine
+  {
+    'nvim-lualine/lualine.nvim',
+    dependencies = { 'kyazdani42/nvim-web-devicons' },
+  },
+  'stevearc/dressing.nvim',
+  'rcarriga/nvim-notify',
+  'klen/nvim-config-local',
+
+  -- Trouble
+  {
+    'folke/trouble.nvim',
+    dependencies = { 'kyazdani42/nvim-web-devicons' },
+    config = function()
+      require("trouble").setup {
+        icons = true,
+      }
+    end
   }
-
-  use {'nvim-telescope/telescope-fzf-native.nvim', run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build' }
-
-  use({'nvim-treesitter/nvim-treesitter'})
-  use("nvim-treesitter/nvim-treesitter-context");
-
-  use({
-    "kdheepak/lazygit.nvim",
-    -- optional for floating window border decoration
-    requires = {
-        "nvim-lua/plenary.nvim",
-    },
 })
 
-  use {
-	  'VonHeikemen/lsp-zero.nvim',
-	  branch = 'v1.x',
-	  requires = {
-		  -- LSP Support
-		  {'neovim/nvim-lspconfig'},
-		  {'williamboman/mason.nvim'},
-		  {'williamboman/mason-lspconfig.nvim'},
-
-		  -- Autocompletion
-		  {'hrsh7th/nvim-cmp'},
-		  {'hrsh7th/cmp-buffer'},
-		  {'hrsh7th/cmp-path'},
-		  {'saadparwaiz1/cmp_luasnip'},
-		  {'hrsh7th/cmp-nvim-lsp'},
-		  {'hrsh7th/cmp-nvim-lua'},
-
-		  -- Snippets
-		  {'L3MON4D3/LuaSnip'},
-		  {'rafamadriz/friendly-snippets'},
-	  }
-  }
-
-  use {'nvim-lualine/lualine.nvim', requires = {'kyazdani42/nvim-web-devicons', opt = true}}
-  use {'stevearc/dressing.nvim'}
-  use 'rcarriga/nvim-notify'
-  use 'klen/nvim-config-local'
-    
-  use({
-    "folke/trouble.nvim",
-    config = function()
-        require("trouble").setup {
-            icons = false,
-            -- your configuration comes here
-            -- or leave it empty to use the default settings
-            -- refer to the configuration section below
-        }
-    end
-  })
-
-end)
-
--- general
-
+-- General settings
 vim.g.mapleader = " "
 
 vim.o.syntax = 'on'
@@ -84,7 +101,6 @@ vim.o.splitright = true
 vim.keymap.set('n', '<leader>m', '<cmd>:marks<CR>', {})
 
 -- nvim-config-local
-
 require('config-local').setup {
   config_files = { ".vimrc.lua" },
   hashfile = vim.fn.stdpath("data") .. "/config-local",
@@ -94,12 +110,9 @@ require('config-local').setup {
   lookup_parents = true,
 }
 
--- treesitter
-
+-- Treesitter
 require'nvim-treesitter.configs'.setup {
   ensure_installed = "all",
-  auto_install = false,
-  sync_install = false,
   auto_install = true,
 
   highlight = {
@@ -107,8 +120,7 @@ require'nvim-treesitter.configs'.setup {
   },
 }
 
--- telescope
-
+-- Telescope
 local builtin = require('telescope.builtin')
 
 vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
@@ -116,11 +128,36 @@ vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
 vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
 vim.keymap.set('n', '<leader>fr', builtin.lsp_references, {})
 
-require('telescope').setup {}
+require('telescope').setup {
+  defaults = {
+    file_ignore_patterns = {"node_modules"},
+    -- Configure icons for Telescope
+    path_display = { "truncate" },
+    winblend = 0,
+    layout_strategy = "horizontal",
+    sorting_strategy = "ascending",
+    layout_config = {
+      horizontal = {
+        prompt_position = "top",
+        preview_width = 0.55,
+        results_width = 0.8,
+      },
+      width = 0.87,
+      height = 0.80,
+      preview_cutoff = 120,
+    },
+    file_previewer = require("telescope.previewers").vim_buffer_cat.new,
+    grep_previewer = require("telescope.previewers").vim_buffer_vimgrep.new,
+    qflist_previewer = require("telescope.previewers").vim_buffer_qflist.new,
+    buffer_previewer_maker = require("telescope.previewers").buffer_previewer_maker,
+    mappings = {
+      n = { ["q"] = require("telescope.actions").close },
+    },
+  },
+}
 require('telescope').load_extension('fzf')
 
--- lsp
-
+-- LSP
 local lsp = require("lsp-zero")
 
 lsp.preset("recommended")
@@ -130,25 +167,23 @@ lsp.ensure_installed({
   'clangd',
   'cmake',
   'csharp_ls',
+  'fsautocomplete',
+  'hls',  -- Haskell Language Server
   'pyright',
   'rust_analyzer',
   'tsserver',
+  'terraformls',
 })
-
---lsp.configure('clangd', {
-    -- cmd = {'/Users/idobbins/projects/dev/llvm-project/build/bin/clangd'},
---    filetypes = { 'c', 'cpp', 'cppm', 'objc', 'objcpp' }
---})
 
 -- Fix Undefined global 'vim'
 lsp.configure('lua-language-server', {
-    settings = {
-        Lua = {
-            diagnostics = {
-                globals = { 'vim' }
-            }
-        }
+  settings = {
+    Lua = {
+      diagnostics = {
+        globals = { 'vim' }
+      }
     }
+  }
 })
 
 require'lspconfig'.millet.setup{}
@@ -170,13 +205,7 @@ lsp.setup_nvim_cmp({
 })
 
 lsp.set_preferences({
-    suggest_lsp_servers = false,
-    sign_icons = {
-        error = 'E',
-        warn = 'W',
-        hint = 'H',
-        info = 'I'
-    }
+  suggest_lsp_servers = false,
 })
 
 lsp.on_attach(function(client, bufnr)
@@ -184,22 +213,22 @@ lsp.on_attach(function(client, bufnr)
 
   vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
   vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts)
-  -- vim.keymap.set("n", "<leader>vws", function() vim.lsp.buf.workspace_symbol() end, opts)
-  -- vim.keymap.set("n", "<leader>vd", function() vim.diagnostic.open_float() end, opts)
   vim.keymap.set("n", "[d", function() vim.diagnostic.goto_next() end, opts)
   vim.keymap.set("n", "]d", function() vim.diagnostic.goto_prev() end, opts)
-  -- vim.keymap.set("n", "<leader>vca", function() vim.lsp.buf.code_action() end, opts)
-  -- vim.keymap.set("n", "<leader>vrr", function() vim.lsp.buf.references() end, opts)
   vim.keymap.set("n", "<leader>rn", function() vim.lsp.buf.rename() end, opts)
-  -- vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts)
 end)
 
 lsp.setup()
 
 vim.diagnostic.config({
-    virtual_text = true
+  virtual_text = true
 })
 
--- lualine
+-- Lualine
+require('lualine').setup {
+  options = {
+    icons_enabled = true,
+    theme = 'auto',
+  }
+}
 
-require('lualine').setup {}
