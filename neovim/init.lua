@@ -78,7 +78,9 @@ require('lazy').setup({
         icons = true,
       }
     end
-  }
+  },
+
+  { "rose-pine/neovim", name = "rose-pine" }    
 })
 
 -- General settings
@@ -96,7 +98,7 @@ vim.o.autoindent = true
 vim.o.termguicolors = true
 vim.o.splitright = true
 
--- vim.cmd.colorscheme 'catppuccin-mocha'
+vim.cmd("colorscheme rose-pine-moon")
 
 vim.keymap.set('n', '<leader>m', '<cmd>:marks<CR>', {})
 
@@ -112,8 +114,9 @@ require('config-local').setup {
 
 -- Treesitter
 require'nvim-treesitter.configs'.setup {
-  ensure_installed = "all",
+  ensure_installed = { "haskell", "python", "javascript", "typescript", "c", "cpp" },
   auto_install = true,
+  sync_install = true,
 
   highlight = {
     enable = true,
@@ -167,10 +170,12 @@ lsp.ensure_installed({
   'clangd',
   'cmake',
   'csharp_ls',
+  'emmet_language_server',
   'fsautocomplete',
   'hls',  -- Haskell Language Server
   'pyright',
   'rust_analyzer',
+  'tailwindcss',
   'tsserver',
   'terraformls',
 })
@@ -232,3 +237,22 @@ require('lualine').setup {
   }
 }
 
+local lspconfig = require('lspconfig')
+
+lspconfig.tailwindcss.setup {
+  filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact", "haskell" },
+  init_options = {
+    userLanguages = {
+      haskell = "html"
+    }
+  },
+  settings = {
+    tailwindCSS = {
+      experimental = {
+        classRegex = {
+          "class_\\s*[\"']([^\"']*)[\"']"
+        }
+      }
+    }
+  }
+}
