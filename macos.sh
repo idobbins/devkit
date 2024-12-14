@@ -42,7 +42,7 @@ else
 fi
 
 echo "Copying configuration files..."
-cp .config/env/macos-flake.nix .config/nix/flake.nix
+cp .config/env/nix/macos-flake.nix .config/nix/flake.nix
 
 # Build and activate configuration
 echo "Building and activating configuration..."
