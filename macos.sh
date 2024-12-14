@@ -27,7 +27,7 @@ if ! command_exists nix; then
     . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
 fi
 
-# Set up directories relative to HOME
+# Set up directories
 cd "$HOME"
 mkdir -p .config/{nix,nvim}
 
@@ -41,21 +41,20 @@ else
     git pull
 fi
 
-# Create symlinks using relative paths
-echo "Creating symlinks..."
-cd "$HOME/.config"
+# Copy flake.nix to nix directory instead of symlinking
+echo "Setting up Nix configuration..."
+cp ".config/env/macos-flake.nix" ".config/nix/flake.nix"
 
-# Neovim config symlink
+# Create Neovim symlink
+echo "Setting up Neovim configuration..."
+cd .config
 ln -sfn env/nvim/init.lua nvim/init.lua
-
-# Nix config symlink 
-ln -sfn env/macos-flake.nix nix/flake.nix
 
 # Build and activate configuration
 echo "Building and activating configuration..."
 cd nix
 nix build --impure
-home-manager switch --flake .#idobbins --impure
+home-manager switch --flake .#$USER --impure
 
 echo "Bootstrap complete! Your macOS environment has been configured."
 echo "Configuration files are in: ~/.config/env"
