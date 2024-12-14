@@ -7,57 +7,61 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  outputs = { nixpkgs, home-manager, ... }: {
-    homeConfigurations."idobbins" = home-manager.lib.homeManagerConfiguration {
-      pkgs = nixpkgs.legacyPackages.aarch64-darwin;
-      
-      modules = [
-        {
-          home = {
-            username = "idobbins";
-            homeDirectory = "/Users/idobbins";
-            stateVersion = "24.05";
-            packages = with pkgs; [
-              # Development tools
-              cmake
-              git
-              jq
-              neovim
-              ripgrep
+  outputs = { nixpkgs, home-manager, ... }:
+    let
+      system = "aarch64-darwin";
+      pkgs = nixpkgs.legacyPackages.${system};
+    in {
+      homeManagerConfigurations = username: homeDirectory: {
+        ${username} = home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          extraSpecialArgs = { inherit username homeDirectory; };
+          
+          modules = [{
+            home = {
+              inherit username homeDirectory;
+              stateVersion = "24.05";
+              packages = with pkgs; [
+                # Development tools
+                cmake
+                git
+                jq
+                neovim
+                ripgrep
+                
+                # macOS specific tools
+                coreutils
+                gnused
+                gawk
+                findutils
+              ];
+            };
+            programs = {
+              home-manager.enable = true;
               
-              # macOS specific tools
-              coreutils
-              gnused
-              gawk
-              findutils
-            ];
-          };
-          programs = {
-            home-manager.enable = true;
-            
-            git = {
-              enable = true;
-              userName = "Isaac Dobbins";
-              userEmail = "isaac.dobbins@icloud.com";
-              extraConfig = {
-                init.defaultBranch = "dev";
-                pull.rebase = true;
+              git = {
+                enable = true;
+                userName = "Isaac Dobbins";
+                userEmail = "isaac.dobbins@icloud.com";
+                extraConfig = {
+                  init.defaultBranch = "dev";
+                  pull.rebase = true;
+                };
+              };
+              neovim = {
+                enable = true;
+                defaultEditor = true;
               };
             };
-            neovim = {
-              enable = true;
-              defaultEditor = true;
+            xdg.configFile = {
+              "nvim" = {
+                source = ./nvim;
+                recursive = true;
+              };
             };
-          };
-          xdg.configFile = {
-            "nvim" = {
-              source = ./nvim;
-              recursive = true;
-            };
-          };
-        }
-      ];
+          }];
+        };
+      };
+      formatter.${system} = pkgs.nixpkgs-fmt;
     };
-    formatter.aarch64-darwin = nixpkgs.legacyPackages.aarch64-darwin.nixpkgs-fmt;
-  };
 }
