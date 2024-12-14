@@ -32,6 +32,6 @@ git clone https://github.com/idobbins/env.git env
 ln -sf "$HOME/.config/env/nix/macos-flake.nix" "$HOME/.config/nix/flake.nix"
 
 # Build and activate configuration
-cd "$HOME/.config/nix" && home-manager switch --flake .#$USER --impure
+cd "$HOME/.config/nix" && home-manager switch --flake .#idobbins
 
 echo "Bootstrap complete! Please restart your terminal."
