@@ -16,7 +16,7 @@ mkdir -p ~/.config/nix
 mkdir -p ~/.config/home-manager
 
 # Download flake.nix
-curl -o ~/.config/home-manager/flake.nix https://raw.githubusercontent.com/YOUR_REPO/YOUR_PATH/flake.nix
+curl -o ~/.config/home-manager/flake.nix https://raw.githubusercontent.com/idobbins/env/refs/heads/dev/macos.sh
 
 # Initial home-manager switch
 echo "Running initial home-manager switch..."
