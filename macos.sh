@@ -1,39 +1,28 @@
 #!/bin/bash
 set -euo pipefail
 
-if [ "$(uname)" != "Darwin" ]; then
-    echo "Error: This script is only for macOS systems"
-    exit 1
-fi
+echo "Installing Nix using Determinate Systems installer..."
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 
-echo "Starting system bootstrap..."
+# Source nix
+. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
 
-# Install Nix if not present
-if ! command -v nix &> /dev/null; then
-    curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --determinate
-    . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
-fi
+echo "Installing home-manager..."
+nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
+nix-channel --update
 
-# Create config directory
-mkdir -p "$HOME/.config/nix"
+echo "Creating initial home-manager configuration..."
+mkdir -p ~/.config/nix
+mkdir -p ~/.config/home-manager
 
-# Clone your repo (replace with your actual repo URL)
-REPO_URL="https://github.com/idobbins/env.git"
-REPO_DIR="$HOME/.config/env"
+# Download flake.nix
+curl -o ~/.config/home-manager/flake.nix https://raw.githubusercontent.com/YOUR_REPO/YOUR_PATH/flake.nix
 
-mkdir -p "$HOME/.config/nix"
+# Initial home-manager switch
+echo "Running initial home-manager switch..."
+cd ~/.config/home-manager
+nix run home-manager/master -- init --switch
 
-rm -rf "$REPO_DIR"
-git clone "$REPO_URL" "$REPO_DIR"
+# Shell will be set by home-manager
 
-# Create flake.nix symlink
-cp "$REPO_DIR/nix/macos-flake.nix" "$HOME/.config/nix/flake.nix"
-
-# Enable flakes and nix-command
-echo "experimental-features = nix-command flakes" > "$HOME/.config/nix/nix.conf"
-
-# Build and activate configuration
-cd "$HOME/.config/nix"
-nix profile install .
-
-echo "Bootstrap complete! Please restart your terminal."
+echo "Installation complete! Please restart your terminal."
