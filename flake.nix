@@ -6,18 +6,15 @@
   };
 
   outputs = { nixpkgs, ... }: {
-    packages.aarch64-darwin = 
-      let 
-        pkgs = import nixpkgs { system = "aarch64-darwin"; };
-      in {
-        default = pkgs.symlinkJoin {
-          name = "dev-tools";
-          paths = with pkgs; [
-            neovim
-            cmake
-            jq
-          ];
-        };
-      };
+    nixosConfigurations."aarch64-darwin" = nixpkgs.lib.nixosSystem {
+      system = "aarch64-darwin";
+      modules = [{
+        environment.systemPackages = with nixpkgs.legacyPackages.aarch64-darwin; [
+          neovim
+          cmake
+          jq
+        ];
+      }];
+    };
   };
 }
