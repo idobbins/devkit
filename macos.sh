@@ -50,12 +50,13 @@ fi
 echo "Creating symlinks..."
 ln -sfn "$ENV_DIR/nix" "$NIX_DIR/profile"
 ln -sfn "$ENV_DIR/nvim" "$NVIM_DIR/profile"
+ln -sfn "$ENV_DIR/macos-flake.nix" "$NIX_DIR/flake.nix"
 
 # Build and activate configuration
 echo "Building and activating configuration..."
 cd "$NIX_DIR"
 nix build
-home-manager switch --flake "$ENV_DIR/#idobbins"
+home-manager switch --flake .#idobbins
 
 echo "Bootstrap complete! Your macOS environment has been configured."
 echo "Configuration files are at: $ENV_DIR"
