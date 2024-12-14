@@ -1,6 +1,5 @@
 {
   description = "MacOS system configuration";
-
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager = {
@@ -8,13 +7,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-
   outputs = { nixpkgs, home-manager, ... }:
     let
       system = "aarch64-darwin";
       pkgs = nixpkgs.legacyPackages.${system};
-      username = "idobbins";
-      homeDirectory = "/Users/${username}";
+      username = builtins.getEnv "USER";
     in {
       homeConfigurations.${username} = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
@@ -22,7 +19,8 @@
         modules = [
           {
             home = {
-              inherit username homeDirectory;
+              username = username;
+              homeDirectory = builtins.getEnv "HOME";
               stateVersion = "23.11";
               packages = with pkgs; [
                 cmake
@@ -32,7 +30,6 @@
                 ripgrep
               ];
             };
-
             programs = {
               home-manager.enable = true;
               
@@ -45,14 +42,11 @@
                   pull.rebase = true;
                 };
               };
-
               neovim = {
                 enable = true;
                 defaultEditor = true;
               };
             };
-
-            # The source directory will be symlinked to the target
             xdg.configFile = {
               "nvim" = {
                 source = ./nvim;
@@ -62,7 +56,6 @@
           }
         ];
       };
-
       formatter.${system} = pkgs.nixpkgs-fmt;
     };
 }
