@@ -41,7 +41,7 @@ else
     git pull
 fi
 
-# Copy flake.nix to nix directory instead of symlinking
+# Copy flake.nix to nix directory
 echo "Setting up Nix configuration..."
 cp ".config/env/macos-flake.nix" ".config/nix/flake.nix"
 
@@ -53,8 +53,9 @@ ln -sfn env/nvim/init.lua nvim/init.lua
 # Build and activate configuration
 echo "Building and activating configuration..."
 cd nix
-nix build --impure
-home-manager switch --flake .#$USER --impure
+nix profile install .
+nix build
+home-manager switch --flake .#$USER
 
 echo "Bootstrap complete! Your macOS environment has been configured."
 echo "Configuration files are in: ~/.config/env"
