@@ -12,7 +12,6 @@
       paths = with pkgs; [
         cmake
         git
-        jq
         neovim
         ripgrep
       ];
