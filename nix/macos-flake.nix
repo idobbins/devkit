@@ -3,19 +3,18 @@
     nixpkgs.url = "github:NixOS/nixpkgs";
   };
 
-  outputs = { self, nixpkgs }: {
-    packages."aarch64-darwin".default = let
-      pkgs = nixpkgs.legacyPackages."aarch64-darwin";
-    in pkgs.buildEnv {
-      name = "home-packages";
+  outputs = { self, nixpkgs }: let
+    system = "aarch64-darwin";
+    pkgs = nixpkgs.legacyPackages.${system};
+  in {
+    packages.${system}.default = pkgs.symlinkJoin {
+      name = "my-packages";
       paths = with pkgs; [
-
-      	# general tools
-	cmake
-	git
-	jq
+        cmake
+        git
+        jq
         neovim
-	ripgrep
+        ripgrep
       ];
     };
   };
