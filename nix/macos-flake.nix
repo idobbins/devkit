@@ -13,11 +13,6 @@
       pkgs = nixpkgs.legacyPackages.${system};
       username = builtins.getEnv "USER";
     in {
-      packages.${system}.default = pkgs.symlinkJoin {
-        name = "home-manager-config";
-        paths = [ ];
-      };
-
       homeConfigurations.${username} = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         
@@ -26,13 +21,20 @@
             home = {
               username = username;
               homeDirectory = builtins.getEnv "HOME";
-              stateVersion = "23.11";
+              stateVersion = "24.05";
               packages = with pkgs; [
+                # Development tools
                 cmake
                 git
                 jq
                 neovim
                 ripgrep
+                
+                # macOS specific tools
+                coreutils     # GNU coreutils
+                gnused       # GNU sed
+                gawk        # GNU awk
+                findutils   # GNU find
               ];
             };
             programs = {
