@@ -21,6 +21,8 @@ mkdir -p "$HOME/.config/nix"
 REPO_URL="https://github.com/idobbins/env.git"
 REPO_DIR="$HOME/.config/env"
 
+mkdir -p "$HOME/.config/nix"
+
 rm -rf "$REPO_DIR"
 git clone "$REPO_URL" "$REPO_DIR"
 
@@ -28,7 +30,6 @@ git clone "$REPO_URL" "$REPO_DIR"
 cp "$REPO_DIR/nix/macos-flake.nix" "$HOME/.config/nix/flake.nix"
 
 # Enable flakes and nix-command
-mkdir -p "$HOME/.config/nix"
 echo "experimental-features = nix-command flakes" > "$HOME/.config/nix/nix.conf"
 
 # Build and activate configuration
