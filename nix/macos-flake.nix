@@ -7,62 +7,57 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  outputs = { nixpkgs, home-manager, ... }:
-    let
-      system = "aarch64-darwin";
-      pkgs = nixpkgs.legacyPackages.${system};
-      username = builtins.getEnv "USER";
-    in {
-      homeConfigurations.${username} = home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
-        
-        modules = [
-          {
-            home = {
-              username = username;
-              homeDirectory = builtins.getEnv "HOME";
-              stateVersion = "24.05";
-              packages = with pkgs; [
-                # Development tools
-                cmake
-                git
-                jq
-                neovim
-                ripgrep
-                
-                # macOS specific tools
-                coreutils     # GNU coreutils
-                gnused       # GNU sed
-                gawk        # GNU awk
-                findutils   # GNU find
-              ];
-            };
-            programs = {
-              home-manager.enable = true;
+  outputs = { nixpkgs, home-manager, ... }: {
+    homeConfigurations."idobbins" = home-manager.lib.homeManagerConfiguration {
+      pkgs = nixpkgs.legacyPackages.aarch64-darwin;
+      
+      modules = [
+        {
+          home = {
+            username = "idobbins";
+            homeDirectory = "/Users/idobbins";
+            stateVersion = "24.05";
+            packages = with pkgs; [
+              # Development tools
+              cmake
+              git
+              jq
+              neovim
+              ripgrep
               
-              git = {
-                enable = true;
-                userName = "Isaac Dobbins";
-                userEmail = "isaac.dobbins@icloud.com";
-                extraConfig = {
-                  init.defaultBranch = "dev";
-                  pull.rebase = true;
-                };
-              };
-              neovim = {
-                enable = true;
-                defaultEditor = true;
+              # macOS specific tools
+              coreutils
+              gnused
+              gawk
+              findutils
+            ];
+          };
+          programs = {
+            home-manager.enable = true;
+            
+            git = {
+              enable = true;
+              userName = "Isaac Dobbins";
+              userEmail = "isaac.dobbins@icloud.com";
+              extraConfig = {
+                init.defaultBranch = "dev";
+                pull.rebase = true;
               };
             };
-            xdg.configFile = {
-              "nvim" = {
-                source = ./nvim;
-                recursive = true;
-              };
+            neovim = {
+              enable = true;
+              defaultEditor = true;
             };
-          }
-        ];
-      };
-      formatter.${system} = pkgs.nixpkgs-fmt;
+          };
+          xdg.configFile = {
+            "nvim" = {
+              source = ./nvim;
+              recursive = true;
+            };
+          };
+        }
+      ];
     };
+    formatter.aarch64-darwin = nixpkgs.legacyPackages.aarch64-darwin.nixpkgs-fmt;
+  };
 }
