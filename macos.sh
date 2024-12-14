@@ -3,7 +3,7 @@
 xcode-select --install
 
 # homebrew
-curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 source ~/.zshrc
 
 # packages
