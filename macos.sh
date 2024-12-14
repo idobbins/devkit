@@ -59,7 +59,11 @@ else
     git pull
 fi
 
-cd "$TARGET_DIR"
+# Verify flake.nix exists in the repository
+if [ ! -f "$TARGET_DIR/flake.nix" ]; then
+    echo "Error: flake.nix not found in repository"
+    exit 1
+fi
 
 # Create symlinks
 echo "Creating symlinks..."
@@ -67,12 +71,12 @@ echo "Creating symlinks..."
 # Create Nix profile symlink
 ln -sfn "$TARGET_DIR/nix" "$NIX_CONFIG_DIR/profile"
 
-# Symlink flake.nix to the correct location
-ln -sfn "$TARGET_DIR/macos-flake.nix" "$NIX_CONFIG_DIR/flake.nix"
+# Symlink the entire repository to .config/nix
+ln -sfn "$TARGET_DIR" "$NIX_CONFIG_DIR/env"
 
 # Build and activate configuration
 echo "Building and activating configuration..."
-cd "$NIX_CONFIG_DIR"
+cd "$TARGET_DIR"  # Important: we need to be in the directory with flake.nix
 nix build
 home-manager switch --flake .#idobbins
 
