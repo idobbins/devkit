@@ -8,15 +8,12 @@
     packages.${builtins.currentSystem}.default = pkgs.buildEnv {
       name = "my-packages";
       paths = with pkgs; [
-
         cmake
         git
 	jq
         neovim
         ripgrep
-
 	nodejs
-
       ];
     };
   };
