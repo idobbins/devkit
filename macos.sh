@@ -41,9 +41,7 @@ else
    git pull
 fi
 
-# Copy configuration files
 echo "Copying configuration files..."
-cp -r .config/env/nvim/* .config/nvim/
 cp .config/env/macos-flake.nix .config/nix/flake.nix
 
 # Build and activate configuration
