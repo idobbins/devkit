@@ -15,7 +15,7 @@
         neovim
         ripgrep
 
-	nodejs_latest
+	nodejs
 
       ];
     };
