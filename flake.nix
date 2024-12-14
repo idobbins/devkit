@@ -1,4 +1,4 @@
-{
+i{
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     home-manager = {
@@ -7,19 +7,19 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager }: let
-    system = "aarch64-darwin";
-    pkgs = nixpkgs.legacyPackages.${system};
-  in {
-    homeConfigurations."${builtins.getEnv "USER"}" = home-manager.lib.homeManagerConfiguration {
-      inherit pkgs;
+  outputs = { nixpkgs, home-manager, ... }: {
+    defaultPackage.aarch64-darwin = 
+      home-manager.defaultPackage.aarch64-darwin;
+
+    homeConfigurations.idobbins = home-manager.lib.homeManagerConfiguration {
+      pkgs = nixpkgs.legacyPackages.aarch64-darwin;
       
       modules = [{
         home = {
-          username = builtins.getEnv "USER";
-          homeDirectory = builtins.getEnv "HOME";
+          username = "idobbins";
+          homeDirectory = "/Users/idobbins";
           stateVersion = "23.11";
-          packages = with pkgs; [
+          packages = with nixpkgs.legacyPackages.aarch64-darwin; [
             cmake
             git
             neovim
