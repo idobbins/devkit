@@ -54,8 +54,8 @@ ln -sfn env/macos-flake.nix nix/flake.nix
 # Build and activate configuration
 echo "Building and activating configuration..."
 cd nix
-nix build
-home-manager switch --flake .#idobbins
+nix build --impure
+home-manager switch --flake .#idobbins --impure
 
 echo "Bootstrap complete! Your macOS environment has been configured."
 echo "Configuration files are in: ~/.config/env"
