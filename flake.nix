@@ -16,7 +16,6 @@
     
     # Define base packages that should be in every shell
     basePackages = with pkgs; [
-      neovim
       cmake
       ripgrep
     ];
@@ -60,6 +59,56 @@
         
         # Let home-manager manage itself
         programs.home-manager.enable = true;
+
+        # Neovim configuration
+        programs.neovim = {
+          enable = true;
+          viAlias = true;
+          vimAlias = true;
+          
+          plugins = with pkgs.vimPlugins; [
+            # Plugin management
+            lazy-nvim
+            
+            # Core plugins
+            nvim-web-devicons
+            telescope-nvim
+            plenary-nvim
+            telescope-fzf-native-nvim
+            nvim-treesitter.withAllGrammars
+            
+            # Git integration
+            lazygit-nvim
+            
+            # LSP and completion
+            lsp-zero-nvim
+            nvim-lspconfig
+            mason-nvim
+            mason-lspconfig-nvim
+            nvim-cmp
+            cmp-buffer
+            cmp-path
+            cmp_luasnip
+            cmp-nvim-lsp
+            cmp-nvim-lua
+            luasnip
+            friendly-snippets
+            
+            # UI enhancements
+            lualine-nvim
+            dressing-nvim
+            nvim-notify
+            nvim-config-local
+            trouble-nvim
+            
+            # Theme
+            rose-pine
+          ];
+
+          extraLuaConfig = ''
+            ${builtins.readFile ./nvim/init.lua}
+          '';
+        };
       }];
     };
   };
