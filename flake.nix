@@ -11,8 +11,11 @@
 
         cmake
         git
+	jq
         neovim
         ripgrep
+
+	nodejs_latest
 
       ];
     };
