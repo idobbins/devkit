@@ -12,55 +12,53 @@
       system = "aarch64-darwin";
       pkgs = nixpkgs.legacyPackages.${system};
     in {
-      homeManagerConfigurations = username: homeDirectory: {
-        ${username} = home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          extraSpecialArgs = { inherit username homeDirectory; };
-          
-          modules = [{
-            home = {
-              inherit username homeDirectory;
-              stateVersion = "24.05";
-              packages = with pkgs; [
-                # Development tools
-                cmake
-                git
-                jq
-                neovim
-                ripgrep
-                
-                # macOS specific tools
-                coreutils
-                gnused
-                gawk
-                findutils
-              ];
-            };
-            programs = {
-              home-manager.enable = true;
+      homeManagerConfigurations.idobbins = home-manager.lib.homeManagerConfiguration {  # Replace with your username
+        inherit pkgs;
+        
+        modules = [{
+          home = {
+            username = "idobbins";  # Replace with your username
+            homeDirectory = "/Users/idobbins";  # Replace with your home directory
+            stateVersion = "24.05";
+            packages = with pkgs; [
+              # Development tools
+              cmake
+              git
+              jq
+              neovim
+              ripgrep
               
-              git = {
-                enable = true;
-                userName = "Isaac Dobbins";
-                userEmail = "isaac.dobbins@icloud.com";
-                extraConfig = {
-                  init.defaultBranch = "dev";
-                  pull.rebase = true;
-                };
-              };
-              neovim = {
-                enable = true;
-                defaultEditor = true;
+              # macOS specific tools
+              coreutils
+              gnused
+              gawk
+              findutils
+            ];
+          };
+          programs = {
+            home-manager.enable = true;
+            
+            git = {
+              enable = true;
+              userName = "Isaac Dobbins";
+              userEmail = "isaac.dobbins@icloud.com";
+              extraConfig = {
+                init.defaultBranch = "dev";
+                pull.rebase = true;
               };
             };
-            xdg.configFile = {
-              "nvim" = {
-                source = ./nvim;
-                recursive = true;
-              };
+            neovim = {
+              enable = true;
+              defaultEditor = true;
             };
-          }];
-        };
+          };
+          xdg.configFile = {
+            "nvim" = {
+              source = ./nvim;
+              recursive = true;
+            };
+          };
+        }];
       };
       formatter.${system} = pkgs.nixpkgs-fmt;
     };
