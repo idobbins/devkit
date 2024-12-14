@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -euo pipefail
 
 # Check if running on macOS
@@ -44,9 +43,11 @@ fi
 REPO_URL="https://github.com/idobbins/env.git"
 TARGET_DIR="$HOME/.config/env"
 CONFIG_DIR="$HOME/.config"
+NIX_CONFIG_DIR="$CONFIG_DIR/nix"
 
-# Create .config directory if it doesn't exist
+# Create necessary directories
 mkdir -p "$CONFIG_DIR"
+mkdir -p "$NIX_CONFIG_DIR"
 
 # Clone or update repository
 if [ ! -d "$TARGET_DIR" ]; then
@@ -63,14 +64,19 @@ cd "$TARGET_DIR"
 # Create symlinks
 echo "Creating symlinks..."
 
-# Symlink flake.nix to home directory
-ln -sfn "$TARGET_DIR/macos-flake.nix" "$HOME/.flake.nix"
+# Create Nix profile symlink
+ln -sfn "$TARGET_DIR/nix" "$NIX_CONFIG_DIR/profile"
+
+# Symlink flake.nix to the correct location
+ln -sfn "$TARGET_DIR/macos-flake.nix" "$NIX_CONFIG_DIR/flake.nix"
 
 # Build and activate configuration
 echo "Building and activating configuration..."
+cd "$NIX_CONFIG_DIR"
 nix build
 home-manager switch --flake .#idobbins
 
 echo "Bootstrap complete! Your macOS environment has been configured."
 echo "Configuration files are at: $TARGET_DIR"
+echo "Nix profile is symlinked at: $NIX_CONFIG_DIR/profile"
 echo "Please restart your terminal for all changes to take effect."
