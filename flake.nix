@@ -8,12 +8,13 @@
     packages.${builtins.currentSystem}.default = pkgs.buildEnv {
       name = "my-packages";
       paths = with pkgs; [
+
         cmake
         git
         neovim
         ripgrep
-        nushell
+
       ];
     };
   };
-}
+
