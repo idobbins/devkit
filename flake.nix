@@ -10,10 +10,10 @@
       paths = with pkgs; [
         cmake
         git
-	jq
+        jq
         neovim
         ripgrep
-	nodejs
+        nodejs
       ];
     };
   };
