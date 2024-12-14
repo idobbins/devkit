@@ -2,7 +2,7 @@
 set -euo pipefail
 
 echo "Installing Nix using Determinate Systems installer..."
-curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --determinate
 
 # Source nix
 . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
