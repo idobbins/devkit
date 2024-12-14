@@ -22,9 +22,10 @@ cd "$HOME/.config" && rm -rf env
 git clone https://github.com/idobbins/env.git env
 
 # Symlink flake configuration
-ln -sf "$HOME/.config/env/nix/macos-flake.nix" "$HOME/.config/nix/flake.nix"
+cp "$HOME/.config/env/nix/macos-flake.nix" "$HOME/.config/nix/flake.nix"
 
 # Build and activate configuration
-cd "$HOME/.config/nix" && nix profile install .
+cd "$HOME/.config/nix"
+nix profile install .
 
 echo "Bootstrap complete! Please restart your terminal."
