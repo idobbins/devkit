@@ -14,13 +14,6 @@ if ! command -v nix &> /dev/null; then
     . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
 fi
 
-# Install home-manager
-if ! command -v home-manager &> /dev/null; then
-    nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
-    nix-channel --update
-    nix-shell '<home-manager>' -A install
-fi
-
 # Set up config directories
 mkdir -p "$HOME/.config/nix"
 
