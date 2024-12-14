@@ -14,42 +14,27 @@
     homeConfigurations."${builtins.getEnv "USER"}" = home-manager.lib.homeManagerConfiguration {
       inherit pkgs;
       
-      modules = [
-        {
-          home = {
-            username = builtins.getEnv "USER";
-            homeDirectory = builtins.getEnv "HOME";
-            stateVersion = "23.11";
-            
-            packages = with pkgs; [
-              cmake
-              git
-              neovim
-              ripgrep
-              nushell
-            ];
-          };
+      modules = [{
+        home = {
+          username = builtins.getEnv "USER";
+          homeDirectory = builtins.getEnv "HOME";
+          stateVersion = "23.11";
+          packages = with pkgs; [
+            cmake
+            git
+            neovim
+            ripgrep
+            nushell
+          ];
+        };
 
-          programs = {
-            home-manager.enable = true;
-            
-            nushell = {
-              enable = true;
-              configFile.text = '''
-                # Your nushell config here
-              ''';
-            };
-          };
+        programs = {
+          home-manager.enable = true;
+          nushell.enable = true;
+        };
 
-          targets.darwin = {
-            enable = true;
-            # Set default shell using home-manager
-            defaults = {
-              loginShell = "nu";
-            };
-          };
-        }
-      ];
+        targets.darwin.enable = true;
+      }];
     };
   };
 }
