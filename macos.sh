@@ -25,7 +25,7 @@ rm -rf "$REPO_DIR"
 git clone "$REPO_URL" "$REPO_DIR"
 
 # Create flake.nix symlink
-ln -sf "$REPO_DIR/flake.nix" "$HOME/.config/nix/flake.nix"
+cp "$REPO_DIR/flake.nix" "$HOME/.config/nix/flake.nix"
 
 # Enable flakes and nix-command
 mkdir -p "$HOME/.config/nix"
