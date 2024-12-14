@@ -16,12 +16,14 @@ sudo mkdir -p "$NIX_BASE_DIR"
 sudo chown $(whoami) "$NIX_BASE_DIR"
 mkdir -p "$CONFIG_DIR"
 
-# Install Nix 
+# Install Nix normally first
 if ! command -v nix &> /dev/null; then
-    curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | \
-    sh -s -- install --determinate --nix-root-dir "$NIX_BASE_DIR/nix"
+    curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --determinate
+    . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
     
-    . "$NIX_BASE_DIR/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh"
+    # Now move the Nix store to our preferred location
+    sudo mv /nix "$NIX_BASE_DIR/"
+    sudo ln -s "$NIX_BASE_DIR/nix" /nix
 fi
 
 # Clone config repo
@@ -33,10 +35,6 @@ cp "$CONFIG_DIR/env/nix/macos-flake.nix" "$CONFIG_DIR/flake.nix"
 
 # Build and activate configuration
 cd "$CONFIG_DIR"
-NIX_STATE_DIR="$NIX_BASE_DIR/nix/var/nix" nix profile install .
-
-# Add environment setup to shell rc file
-SHELL_RC="$HOME/.$(basename $SHELL)rc"
-echo "source $NIX_BASE_DIR/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh" >> "$SHELL_RC"
+nix profile install .
 
 echo "Bootstrap complete! Please restart your terminal."
