@@ -3,28 +3,28 @@ set -euo pipefail
 
 # Check if running on macOS
 if [ "$(uname)" != "Darwin" ]; then
-    echo "Error: This script is only for macOS systems"
-    exit 1
+   echo "Error: This script is only for macOS systems"
+   exit 1
 fi
 
 # Function to check if a command exists
 command_exists() {
-    command -v "$1" >/dev/null 2>&1
+   command -v "$1" >/dev/null 2>&1
 }
 
 echo "Starting macOS system bootstrap..."
 
 # Check for Xcode Command Line Tools
 if ! command_exists gcc; then
-    echo "Installing Xcode Command Line Tools..."
-    sudo xcode-select --install
+   echo "Installing Xcode Command Line Tools..."
+   sudo xcode-select --install
 fi
 
 # Install Nix if not already installed
 if ! command_exists nix; then
-    echo "Installing Nix..."
-    curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --determinate
-    . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+   echo "Installing Nix..."
+   curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --determinate
+   . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
 fi
 
 # Set up directories
@@ -33,26 +33,22 @@ mkdir -p .config/{nix,nvim}
 
 # Clone or update repository
 if [ ! -d ".config/env" ]; then
-    echo "Cloning configuration repository..."
-    git clone https://github.com/idobbins/env.git .config/env
+   echo "Cloning configuration repository..."
+   git clone https://github.com/idobbins/env.git .config/env
 else
-    echo "Updating configuration repository..."
-    cd .config/env
-    git pull
+   echo "Updating configuration repository..."
+   cd .config/env
+   git pull
 fi
 
-# Copy flake.nix to nix directory
-echo "Setting up Nix configuration..."
-cp ".config/env/macos-flake.nix" ".config/nix/flake.nix"
-
-# Create Neovim symlink
-echo "Setting up Neovim configuration..."
-cd .config
-ln -sfn env/nvim/init.lua nvim/init.lua
+# Copy configuration files
+echo "Copying configuration files..."
+cp -r .config/env/nvim/* .config/nvim/
+cp .config/env/macos-flake.nix .config/nix/flake.nix
 
 # Build and activate configuration
 echo "Building and activating configuration..."
-cd nix
+cd .config/nix
 nix profile install .
 nix build
 home-manager switch --flake .#$USER
