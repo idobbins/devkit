@@ -47,8 +47,6 @@ cp .config/env/nix/macos-flake.nix .config/nix/flake.nix
 # Build and activate configuration
 echo "Building and activating configuration..."
 cd .config/nix
-nix profile install .
-nix build
 home-manager switch --flake .#$USER
 
 echo "Bootstrap complete! Your macOS environment has been configured."

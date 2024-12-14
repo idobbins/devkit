@@ -13,6 +13,11 @@
       pkgs = nixpkgs.legacyPackages.${system};
       username = builtins.getEnv "USER";
     in {
+      packages.${system}.default = pkgs.symlinkJoin {
+        name = "home-manager-config";
+        paths = [ ];
+      };
+
       homeConfigurations.${username} = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         
