@@ -18,8 +18,6 @@
       # Development tools
       cmake
       ripgrep
-      zlib
-      zlib.dev
 
       # Languages and tooling
       python3
@@ -80,13 +78,6 @@
         };
         
         programs.home-manager.enable = true;
-
-        programs.zsh = {
-          enable = true;
-          initExtra = ''
-            export CPATH="$HOME/.nix-profile/include:$CPATH"
-          '';
-        };
 
         programs.neovim = {
           enable = true;
