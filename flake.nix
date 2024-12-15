@@ -66,6 +66,11 @@
   in {
     devShells.${system}.default = pkgs.mkShell {
       packages = commonPackages;
+
+      buildInputs = [ pkgs.zlib ];
+      
+      # Add pkg-config path so build tools can find zlib
+      PKG_CONFIG_PATH = "${pkgs.zlib.dev}/lib/pkgconfig";
     };
 
     homeConfigurations."idobbins" = home-manager.lib.homeManagerConfiguration {
