@@ -78,10 +78,10 @@
           packages = commonPackages;
           stateVersion = "23.11";
 
+          # Add session variables here
           sessionVariables = {
-            C_INCLUDE_PATH = "$HOME/.nix-profile/include";
+            PATH = "$HOME/.nix-profile/include:$PATH";
           };
-
         };
         
         programs.home-manager.enable = true;
