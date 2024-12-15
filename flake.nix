@@ -18,7 +18,6 @@
       # Development tools
       cmake
       ripgrep
-      zlib
 
       # Languages and tooling
       python3
@@ -32,7 +31,7 @@
       rustfmt
         
       # Haskell tooling
-      ghc
+      ghc.withPackages (hp: with hp; [ zlib ])
       cabal-install
       haskellPackages.ghcid
 
