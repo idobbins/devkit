@@ -24,33 +24,35 @@
       poetry
       black
 
-      # We have rustup at home
+      # Rust tooling
       cargo
       rustc
-      rust-analyzer
       clippy
       rustfmt
         
-      # haskell and deps
+      # Haskell tooling
       ghc
       cabal-install
       haskellPackages.ghcid
-
 
       # Dependencies for neovim plugins
       nodejs # Required for some LSP servers
       git # For lazy.nvim
       
-      # Language Servers
-      bash-language-server
-      clang-tools # Provides clangd
-      cmake-language-server
-      omnisharp-roslyn # C# language server
-      # haskell-language-server
-      pyright
-      typescript-language-server
-      terraform-ls
-      lua-language-server
+      # Language Servers (matching init.lua configuration)
+      bash-language-server      # bashls
+      clang-tools              # clangd
+      cmake-language-server    # cmake
+      omnisharp-roslyn        # csharp_ls
+      emmet-language-server   # emmet_ls
+      fsautocomplete          # fsautocomplete
+      haskell-language-server # hls
+      pyright                 # pyright
+      rust-analyzer           # rust_analyzer
+      tailwindcss-language-server # tailwindcss
+      typescript-language-server  # tsserver
+      terraform-ls            # terraformls
+      lua-language-server     # lua_ls
       
       # Tree-sitter dependencies
       tree-sitter
@@ -58,11 +60,6 @@
       # Additional tools needed by plugins
       lazygit # For lazygit.nvim
       fzf # For telescope-fzf-native
-      
-      # Mason dependencies
-      wget
-      unzip
-      gzip
     ];
   in {
     devShells.${system}.default = pkgs.mkShell {

@@ -27,7 +27,7 @@ require('lazy').setup({
     build = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'
   },
 
-  -- Updated Treesitter configuration
+  -- Treesitter configuration
   {
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
@@ -42,37 +42,28 @@ require('lazy').setup({
     end,
   },
 
-  -- Lazygit configuration remains the same
+  -- Lazygit configuration
   {
     'kdheepak/lazygit.nvim',
     dependencies = { 'nvim-lua/plenary.nvim' },
   },
 
-  -- Updated LSP configuration
-  {
-    'VonHeikemen/lsp-zero.nvim',
-    branch = 'v3.x',
-    dependencies = {
-      -- LSP Support
-      'neovim/nvim-lspconfig',
-      'williamboman/mason.nvim',
-      'williamboman/mason-lspconfig.nvim',
+  -- LSP Configuration
+  'neovim/nvim-lspconfig',
 
-      -- Autocompletion
-      'hrsh7th/nvim-cmp',
-      'hrsh7th/cmp-buffer',
-      'hrsh7th/cmp-path',
-      'saadparwaiz1/cmp_luasnip',
-      'hrsh7th/cmp-nvim-lsp',
-      'hrsh7th/cmp-nvim-lua',
+  -- Autocompletion
+  'hrsh7th/nvim-cmp',
+  'hrsh7th/cmp-buffer',
+  'hrsh7th/cmp-path',
+  'saadparwaiz1/cmp_luasnip',
+  'hrsh7th/cmp-nvim-lsp',
+  'hrsh7th/cmp-nvim-lua',
 
-      -- Snippets
-      'L3MON4D3/LuaSnip',
-      'rafamadriz/friendly-snippets',
-    }
-  },
+  -- Snippets
+  'L3MON4D3/LuaSnip',
+  'rafamadriz/friendly-snippets',
 
-  -- Other plugins remain the same
+  -- Other plugins
   {
     'nvim-lualine/lualine.nvim',
     dependencies = { 'kyazdani42/nvim-web-devicons' },
@@ -106,8 +97,9 @@ vim.o.autoindent = true
 vim.o.termguicolors = true
 vim.o.splitright = true
 
+-- Theme configuration
 require("catppuccin").setup({
-    flavour = "mocha", -- Choose your preferred flavor: latte, frappe, macchiato, mocha
+    flavour = "mocha",
     term_colors = true,
     color_overrides = {},
 })
@@ -117,7 +109,7 @@ vim.cmd.colorscheme "catppuccin"
 
 vim.keymap.set('n', '<leader>m', '<cmd>:marks<CR>', {})
 
--- nvim-config-local configuration remains the same
+-- nvim-config-local configuration
 require('config-local').setup {
   config_files = { ".vimrc.lua" },
   hashfile = vim.fn.stdpath("data") .. "/config-local",
@@ -160,45 +152,92 @@ telescope.setup {
 }
 telescope.load_extension('fzf')
 
--- Updated LSP configuration
-local lsp_zero = require('lsp-zero')
-lsp_zero.on_attach(function(client, bufnr)
-  lsp_zero.default_keymaps({buffer = bufnr})
-  local opts = {buffer = bufnr, remap = false}
+-- LSP Configuration
+local lspconfig = require('lspconfig')
 
-  vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
-  vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts)
-  vim.keymap.set("n", "[d", function() vim.diagnostic.goto_next() end, opts)
-  vim.keymap.set("n", "]d", function() vim.diagnostic.goto_prev() end, opts)
-  vim.keymap.set("n", "<leader>rn", function() vim.lsp.buf.rename() end, opts)
-end)
+-- Global LSP mappings
+local on_attach = function(client, bufnr)
+  local opts = { buffer = bufnr, remap = false }
+  
+  vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+  vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+  vim.keymap.set("n", "[d", vim.diagnostic.goto_next, opts)
+  vim.keymap.set("n", "]d", vim.diagnostic.goto_prev, opts)
+  vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+  vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+  vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+end
 
-require('mason').setup({})
-require('mason-lspconfig').setup({
-  ensure_installed = {
-    'bashls',
-    'clangd',
-    'cmake',
-    'csharp_ls',
-    'emmet_ls',
-    'fsautocomplete',
-    'hls',
-    'pyright',
-    'rust_analyzer',
-    'tailwindcss',
-    'tsserver',
-    'terraformls',
-  },
-  handlers = {
-    lsp_zero.default_setup,
-    lua_ls = function()
-      local lua_opts = lsp_zero.nvim_lua_ls()
-      require('lspconfig').lua_ls.setup(lua_opts)
-    end,
+-- LSP capabilities with nvim-cmp support
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
+
+-- Configure each LSP server
+local servers = {
+  'bashls',
+  'clangd',
+  'cmake',
+  'csharp_ls',
+  'emmet_ls',
+  'fsautocomplete',
+  'hls',
+  'pyright',
+  'rust_analyzer',
+  'tsserver',
+  'terraformls'
+}
+
+for _, lsp in ipairs(servers) do
+  lspconfig[lsp].setup {
+    on_attach = on_attach,
+    capabilities = capabilities,
   }
-})
+end
 
--- Updated completion configuration
+-- Special configuration for lua_ls
+lspconfig.lua_ls.setup {
+  on_attach = on_attach,
+  capabilities = capabilities,
+  settings = {
+    Lua = {
+      runtime = {
+        version = 'LuaJIT',
+      },
+      diagnostics = {
+        globals = {'vim'},
+      },
+      workspace = {
+        library = vim.api.nvim_get_runtime_file("", true),
+        checkThirdParty = false,
+      },
+      telemetry = {
+        enable = false,
+      },
+    },
+  },
+}
+
+-- Tailwind CSS configuration
+lspconfig.tailwindcss.setup {
+  on_attach = on_attach,
+  capabilities = capabilities,
+  filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact", "haskell" },
+  init_options = {
+    userLanguages = {
+      haskell = "html"
+    }
+  },
+  settings = {
+    tailwindCSS = {
+      experimental = {
+        classRegex = {
+          "class_\\s*[\"']([^\"']*)[\"']"
+        }
+      }
+    }
+  }
+}
+
+-- Completion configuration
 local cmp = require('cmp')
 local cmp_select = {behavior = cmp.SelectBehavior.Select}
 
@@ -228,24 +267,5 @@ require('lualine').setup {
   options = {
     icons_enabled = true,
     theme = 'auto',
-  }
-}
-
--- Tailwind CSS configuration
-require('lspconfig').tailwindcss.setup {
-  filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact", "haskell" },
-  init_options = {
-    userLanguages = {
-      haskell = "html"
-    }
-  },
-  settings = {
-    tailwindCSS = {
-      experimental = {
-        classRegex = {
-          "class_\\s*[\"']([^\"']*)[\"']"
-        }
-      }
-    }
   }
 }
