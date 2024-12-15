@@ -84,12 +84,7 @@
         programs.zsh = {
           enable = true;
           initExtra = ''
-            export PATH="$HOME/.nix-profile/include:$PATH"
-            export CPATH=/path/to/includes:$CPATH
-            # Add any other environment variables you need here
-          '';
-          envExtra = ''
-            export NIX_PATH="$HOME/.nix-defexpr/channels:$NIX_PATH"
+            export CPATH="$HOME/.nix-profile/include:$CPATH"
           '';
         };
 
