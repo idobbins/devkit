@@ -79,10 +79,9 @@
           stateVersion = "23.11";
 
           sessionVariables = {
-            NIX_LD_LIBRARY_PATH = "${pkgs.lib.makeLibraryPath commonPackages}";
-            LIBRARY_PATH = "${pkgs.lib.makeLibraryPath commonPackages}";
-            C_INCLUDE_PATH = "${pkgs.lib.makeSearchPathSuffix "include" commonPackages}";
+            C_INCLUDE_PATH = "$HOME/.nix-profile/include";
           };
+
         };
         
         programs.home-manager.enable = true;
