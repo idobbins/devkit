@@ -77,6 +77,12 @@
           homeDirectory = "/Users/idobbins";
           packages = commonPackages;
           stateVersion = "23.11";
+
+          sessionVariables = {
+            NIX_LD_LIBRARY_PATH = "${pkgs.lib.makeLibraryPath commonPackages}";
+            LIBRARY_PATH = "${pkgs.lib.makeLibraryPath commonPackages}";
+            C_INCLUDE_PATH = "${pkgs.lib.makeSearchPathSuffix "include" commonPackages}";
+          };
         };
         
         programs.home-manager.enable = true;
