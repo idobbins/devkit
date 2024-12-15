@@ -67,14 +67,6 @@
   in {
     devShells.${system}.default = pkgs.mkShell {
       packages = commonPackages;
-        
-      shellHook = ''
-        export LIBRARY_PATH=${pkgs.lib.makeLibraryPath [
-          pkgs.zlib
-        ]}:$LIBRARY_PATH
-        export C_INCLUDE_PATH=${pkgs.zlib.dev}/include:$C_INCLUDE_PATH
-        export PKG_CONFIG_PATH=${pkgs.zlib.dev}/lib/pkgconfig:$PKG_CONFIG_PATH
-      '';
     };
 
     homeConfigurations."idobbins" = home-manager.lib.homeManagerConfiguration {
@@ -86,6 +78,8 @@
           homeDirectory = "/Users/idobbins";
           packages = commonPackages;
           stateVersion = "23.11";
+
+          LD_LIBRARY_PATH = "${pkgs.lib.makeLibraryPath ldDeps}:$LD_LIBRARY_PATH";
         };
         
         programs.home-manager.enable = true;
