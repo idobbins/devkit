@@ -19,7 +19,7 @@
       cmake
       ripgrep
       zlib
-      pkg-config
+      zlib.dev
 
       # Languages and tooling
       python3
@@ -75,12 +75,8 @@
         home = {
           username = "idobbins";
           homeDirectory = "/Users/idobbins";
-          packages = commonPackages ++ [ pkgs.zlib.dev ];  # Add zlib.dev here
+          packages = commonPackages;
           stateVersion = "23.11";
-          sessionVariables = {
-            LIBRARY_PATH = "${pkgs.zlib}/lib";
-            C_INCLUDE_PATH = "${pkgs.zlib.dev}/include";
-          };
         };
         
         programs.home-manager.enable = true;
