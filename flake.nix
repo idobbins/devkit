@@ -75,8 +75,10 @@
       shellHook = ''
         export LIBRARY_PATH=${pkgs.zlib}/lib:$LIBRARY_PATH
         export C_INCLUDE_PATH=${pkgs.zlib.dev}/include:$C_INCLUDE_PATH
+        export CPATH=${pkgs.zlib.dev}/include:$CPATH
+        export LD_LIBRARY_PATH=${pkgs.zlib}/lib:$LD_LIBRARY_PATH
+        export PKG_CONFIG_PATH=${pkgs.zlib.dev}/lib/pkgconfig:$PKG_CONFIG_PATH
       '';
-
     };
 
     homeConfigurations."idobbins" = home-manager.lib.homeManagerConfiguration {
