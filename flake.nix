@@ -50,10 +50,6 @@
       lazygit # For lazygit.nvim
       fzf # For telescope-fzf-native
       
-      # Build dependencies
-      gcc
-      gnumake
-      
       # Mason dependencies
       wget
       unzip
