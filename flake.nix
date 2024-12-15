@@ -14,7 +14,6 @@
     system = "aarch64-darwin";
     pkgs = nixpkgs.legacyPackages.${system};
     
-    # Single definition of packages used everywhere
     commonPackages = with pkgs; [
       # Development tools
       cmake
@@ -28,21 +27,19 @@
       cargo
       rust-analyzer
 
-      # Neovim and dependencies
-      neovim
+      # Neovim and dependencies - neovim already installed
       nodejs # Required for some LSP servers
       git # For lazy.nvim
       
-      # Language Servers (from init.lua)
+      # Language Servers
       nodePackages.bash-language-server
       clang-tools # Provides clangd
       cmake-language-server
-      nodePackages.csharp-language-server
-      nodePackages.emmet-ls
+      omnisharp-roslyn # C# language server
       haskell-language-server
-      nodePackages.pyright
+      pyright
       rust-analyzer
-      nodePackages.typescript-language-server
+      typescript-language-server
       terraform-ls
       lua-language-server
       
@@ -60,7 +57,6 @@
       gzip
     ];
   in {
-    # This makes the development environment automatically active in the project directory
     devShells.${system}.default = pkgs.mkShell {
       packages = commonPackages;
     };
