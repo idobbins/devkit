@@ -66,19 +66,6 @@
   in {
     devShells.${system}.default = pkgs.mkShell {
       packages = commonPackages;
-
-      buildInputs = [ 
-        pkgs.zlib 
-        pkgs.zlib.dev
-      ];
-      
-      shellHook = ''
-        export LIBRARY_PATH=${pkgs.zlib}/lib:$LIBRARY_PATH
-        export C_INCLUDE_PATH=${pkgs.zlib.dev}/include:$C_INCLUDE_PATH
-        export CPATH=${pkgs.zlib.dev}/include:$CPATH
-        export LD_LIBRARY_PATH=${pkgs.zlib}/lib:$LD_LIBRARY_PATH
-        export PKG_CONFIG_PATH=${pkgs.zlib.dev}/lib/pkgconfig:$PKG_CONFIG_PATH
-      '';
     };
 
     homeConfigurations."idobbins" = home-manager.lib.homeManagerConfiguration {
@@ -88,8 +75,12 @@
         home = {
           username = "idobbins";
           homeDirectory = "/Users/idobbins";
-          packages = commonPackages;
+          packages = commonPackages ++ [ pkgs.zlib.dev ];  # Add zlib.dev here
           stateVersion = "23.11";
+          sessionVariables = {
+            LIBRARY_PATH = "${pkgs.zlib}/lib";
+            C_INCLUDE_PATH = "${pkgs.zlib.dev}/include";
+          };
         };
         
         programs.home-manager.enable = true;
