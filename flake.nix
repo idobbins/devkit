@@ -27,12 +27,12 @@
       cargo
       rust-analyzer
 
-      # Neovim and dependencies - neovim already installed
+      # Dependencies for neovim plugins
       nodejs # Required for some LSP servers
       git # For lazy.nvim
       
       # Language Servers
-      nodePackages.bash-language-server
+      bash-language-server
       clang-tools # Provides clangd
       cmake-language-server
       omnisharp-roslyn # C# language server
@@ -49,8 +49,13 @@
       # Additional tools needed by plugins
       lazygit # For lazygit.nvim
       fzf # For telescope-fzf-native
-      gcc # Required for building some dependencies
-
+      
+      # Build dependencies
+      gcc
+      gnumake
+      darwin.apple_sdk.frameworks.CoreFoundation
+      darwin.apple_sdk.frameworks.CoreServices
+      
       # Mason dependencies
       wget
       unzip
@@ -59,6 +64,11 @@
   in {
     devShells.${system}.default = pkgs.mkShell {
       packages = commonPackages;
+      
+      # Add SDKROOT environment variable
+      shellHook = ''
+        export SDKROOT="${pkgs.darwin.apple_sdk.sdk}"
+      '';
     };
 
     homeConfigurations."idobbins" = home-manager.lib.homeManagerConfiguration {
@@ -70,6 +80,11 @@
           homeDirectory = "/Users/idobbins";
           packages = commonPackages;
           stateVersion = "23.11";
+          
+          # Add necessary environment variables
+          sessionVariables = {
+            SDKROOT = "${pkgs.darwin.apple_sdk.sdk}";
+          };
         };
         
         programs.home-manager.enable = true;
