@@ -1,5 +1,5 @@
 {
-  description = "System and development environments";
+  description = "Unified development environment";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -14,36 +14,57 @@
     system = "aarch64-darwin";
     pkgs = nixpkgs.legacyPackages.${system};
     
-    # Define base packages that should be in every shell
-    basePackages = with pkgs; [
+    # Single definition of packages used everywhere
+    commonPackages = with pkgs; [
+      # Development tools
       cmake
       ripgrep
+
+      # Languages and tooling
+      python3
+      poetry
+      black
+      rustc
+      cargo
+      rust-analyzer
+
+      # Neovim and dependencies
+      neovim
+      nodejs # Required for some LSP servers
+      git # For lazy.nvim
+      
+      # Language Servers (from init.lua)
+      nodePackages.bash-language-server
+      clang-tools # Provides clangd
+      cmake-language-server
+      nodePackages.csharp-language-server
+      nodePackages.emmet-ls
+      haskell-language-server
+      nodePackages.pyright
+      rust-analyzer
+      nodePackages.typescript-language-server
+      terraform-ls
+      lua-language-server
+      
+      # Tree-sitter dependencies
+      tree-sitter
+      
+      # Additional tools needed by plugins
+      lazygit # For lazygit.nvim
+      fzf # For telescope-fzf-native
+      gcc # Required for building some dependencies
+
+      # Mason dependencies
+      wget
+      unzip
+      gzip
     ];
   in {
-    # Development shells for project-specific work
-    devShells.${system} = {
-      default = pkgs.mkShell {
-        packages = basePackages;
-      };
-
-      python = pkgs.mkShell {
-        packages = basePackages ++ (with pkgs; [
-          python3
-          poetry
-          black
-        ]);
-      };
-
-      rust = pkgs.mkShell {
-        packages = basePackages ++ (with pkgs; [
-          rustc
-          cargo
-          rust-analyzer
-        ]);
-      };
+    # This makes the development environment automatically active in the project directory
+    devShells.${system}.default = pkgs.mkShell {
+      packages = commonPackages;
     };
 
-    # Home Manager configuration
     homeConfigurations."idobbins" = home-manager.lib.homeManagerConfiguration {
       inherit pkgs;
       
@@ -51,60 +72,17 @@
         home = {
           username = "idobbins";
           homeDirectory = "/Users/idobbins";
-          packages = basePackages;
-          
-          # Don't change these
+          packages = commonPackages;
           stateVersion = "23.11";
         };
         
-        # Let home-manager manage itself
         programs.home-manager.enable = true;
 
-        # Neovim configuration
         programs.neovim = {
           enable = true;
           viAlias = true;
           vimAlias = true;
-          
-          plugins = with pkgs.vimPlugins; [
-            # Plugin management
-            lazy-nvim
-            
-            # Core plugins
-            nvim-web-devicons
-            telescope-nvim
-            plenary-nvim
-            telescope-fzf-native-nvim
-            nvim-treesitter.withAllGrammars
-            
-            # Git integration
-            lazygit-nvim
-            
-            # LSP and completion
-            lsp-zero-nvim
-            nvim-lspconfig
-            mason-nvim
-            mason-lspconfig-nvim
-            nvim-cmp
-            cmp-buffer
-            cmp-path
-            cmp_luasnip
-            cmp-nvim-lsp
-            cmp-nvim-lua
-            luasnip
-            friendly-snippets
-            
-            # UI enhancements
-            lualine-nvim
-            dressing-nvim
-            nvim-notify
-            nvim-config-local
-            trouble-nvim
-            
-            # Theme
-            rose-pine
-          ];
-
+          defaultEditor = true;
           extraLuaConfig = ''
             ${builtins.readFile ./nvim/init.lua}
           '';
