@@ -86,7 +86,7 @@
           enable = true;
           viAlias = true;
           vimAlias = true;
-          defaultEditor = false;
+          defaultEditor = true;
           extraLuaConfig = ''
             ${builtins.readFile ./nvim/init.lua}
           '';
