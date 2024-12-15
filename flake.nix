@@ -18,6 +18,9 @@
       # Development tools
       cmake
       ripgrep
+      zlib
+      zlib.dev
+      pkg-config
 
       # Languages and tooling
       python3
@@ -31,7 +34,7 @@
       rustfmt
         
       # Haskell tooling
-      ghc.withPackages (hp: with hp; [ zlib ])
+      ghc
       cabal-install
       haskellPackages.ghcid
 
@@ -64,6 +67,12 @@
   in {
     devShells.${system}.default = pkgs.mkShell {
       packages = commonPackages;
+
+      shellHook = ''
+        export LD_LIBRARY_PATH=${pkgs.lib.makeLibraryPath [
+        pkgs.zlib
+      ]}:$LD_LIBRARY_PATH
+    '';
     };
 
     homeConfigurations."idobbins" = home-manager.lib.homeManagerConfiguration {
