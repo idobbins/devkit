@@ -62,11 +62,6 @@
   in {
     devShells.${system}.default = pkgs.mkShell {
       packages = commonPackages;
-      
-      # Add SDKROOT environment variable
-      shellHook = ''
-        export SDKROOT="${pkgs.darwin.apple_sdk.sdk}"
-      '';
     };
 
     homeConfigurations."idobbins" = home-manager.lib.homeManagerConfiguration {
