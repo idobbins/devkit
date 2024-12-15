@@ -182,7 +182,7 @@ require('mason-lspconfig').setup({
     'csharp_ls',
     'emmet_ls',
     'fsautocomplete',
-    --'hls',
+    'hls',
     'pyright',
     'rust_analyzer',
     'tailwindcss',

@@ -46,7 +46,7 @@
       clang-tools # Provides clangd
       cmake-language-server
       omnisharp-roslyn # C# language server
-      haskell-language-server
+      # haskell-language-server
       pyright
       typescript-language-server
       terraform-ls
