@@ -105,7 +105,7 @@ require("catppuccin").setup({
 })
 
 vim.opt.termguicolors = true
-vim.cmd.colorscheme "catppuccin"
+vim.cmd.colorscheme "catppuccin-macchiato"
 
 vim.keymap.set('n', '<leader>m', '<cmd>:marks<CR>', {})
 
