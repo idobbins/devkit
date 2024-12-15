@@ -67,10 +67,16 @@
     devShells.${system}.default = pkgs.mkShell {
       packages = commonPackages;
 
-      buildInputs = [ pkgs.zlib ];
+      buildInputs = [ 
+        pkgs.zlib 
+        pkgs.zlib.dev
+      ];
       
-      # Add pkg-config path so build tools can find zlib
-      PKG_CONFIG_PATH = "${pkgs.zlib.dev}/lib/pkgconfig";
+      shellHook = ''
+        export LIBRARY_PATH=${pkgs.zlib}/lib:$LIBRARY_PATH
+        export C_INCLUDE_PATH=${pkgs.zlib.dev}/include:$C_INCLUDE_PATH
+      '';
+
     };
 
     homeConfigurations."idobbins" = home-manager.lib.homeManagerConfiguration {
