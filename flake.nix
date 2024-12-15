@@ -78,11 +78,16 @@
           homeDirectory = "/Users/idobbins";
           packages = commonPackages;
           stateVersion = "23.11";
-
-          LD_LIBRARY_PATH = "${pkgs.lib.makeLibraryPath ldDeps}:$LD_LIBRARY_PATH";
         };
         
         programs.home-manager.enable = true;
+
+        programs.zsh = {
+          enable = true;
+          initExtra = ''
+            export C_INCLUDE_PATH="$HOME/.nix-profile/include:$C_INCLUDE_PATH"
+          '';
+        };
 
         programs.neovim = {
           enable = true;
