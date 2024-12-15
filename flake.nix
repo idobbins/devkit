@@ -23,9 +23,19 @@
       python3
       poetry
       black
-      rustc
+
+      # We have rustup at home
       cargo
+      rustc
       rust-analyzer
+      clippy
+      rustfmt
+        
+      # haskell and deps
+      ghc
+      cabal-install
+      haskellPackages.ghcid
+
 
       # Dependencies for neovim plugins
       nodejs # Required for some LSP servers
@@ -38,7 +48,6 @@
       omnisharp-roslyn # C# language server
       haskell-language-server
       pyright
-      rust-analyzer
       typescript-language-server
       terraform-ls
       lua-language-server
@@ -77,7 +86,7 @@
           enable = true;
           viAlias = true;
           vimAlias = true;
-          defaultEditor = true;
+          defaultEditor = false;
           extraLuaConfig = ''
             ${builtins.readFile ./nvim/init.lua}
           '';
