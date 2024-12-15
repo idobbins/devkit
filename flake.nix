@@ -73,11 +73,6 @@
           homeDirectory = "/Users/idobbins";
           packages = commonPackages;
           stateVersion = "23.11";
-          
-          # Add necessary environment variables
-          sessionVariables = {
-            SDKROOT = "${pkgs.darwin.apple_sdk.sdk}";
-          };
         };
         
         programs.home-manager.enable = true;
