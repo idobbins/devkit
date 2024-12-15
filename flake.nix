@@ -18,6 +18,7 @@
       # Development tools
       cmake
       ripgrep
+      zlib
 
       # Languages and tooling
       python3
