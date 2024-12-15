@@ -18,6 +18,8 @@
       # Development tools
       cmake
       ripgrep
+      zlib
+      pkg-config
 
       # Languages and tooling
       python3
