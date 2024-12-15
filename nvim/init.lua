@@ -182,7 +182,7 @@ local servers = {
   'hls',
   'pyright',
   'rust_analyzer',
-  'tsserver',
+  'ts_ls',
   'terraformls'
 }
 
