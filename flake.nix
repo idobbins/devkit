@@ -77,14 +77,20 @@
           homeDirectory = "/Users/idobbins";
           packages = commonPackages;
           stateVersion = "23.11";
-
-          # Add session variables here
-          sessionVariables = {
-            PATH = "$HOME/.nix-profile/include:$PATH";
-          };
         };
         
         programs.home-manager.enable = true;
+
+        programs.zsh = {
+          enable = true;
+          initExtra = ''
+            export PATH="$HOME/.nix-profile/include:$PATH"
+            # Add any other environment variables you need here
+          '';
+          envExtra = ''
+            export NIX_PATH="$HOME/.nix-defexpr/channels:$NIX_PATH"
+          '';
+        };
 
         programs.neovim = {
           enable = true;
