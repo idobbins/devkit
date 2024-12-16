@@ -1,104 +1,118 @@
 {
-  description = "Unified development environment";
+  description = "Development environment";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    home-manager = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
-  outputs = { nixpkgs, home-manager, ... }: 
+  outputs = { nixpkgs, ... }:
   let
     system = "aarch64-darwin";
     pkgs = nixpkgs.legacyPackages.${system};
     
-    commonPackages = with pkgs; [
-      # Development tools
-      cmake
-      ripgrep
-      zlib
-      zlib.dev
-      pkg-config
+    # Create neovim with custom configuration and plugins
+    customNeovim = pkgs.neovim.override {
+      configure = {
+        customRC = builtins.readFile ./nvim/init.lua;
+        packages.myVimPackage = with pkgs.vimPlugins; {
+          start = [
+            # Icons
+            nvim-web-devicons
 
-      # Languages and tooling
-      python3
-      poetry
-      black
+            # Telescope and dependencies
+            telescope-nvim
+            plenary-nvim
+            telescope-fzf-native-nvim
 
-      # Rust tooling
-      cargo
-      rustc
-      clippy
-      rustfmt
-        
-      # Haskell tooling
-      ghc
-      cabal-install
-      haskellPackages.ghcid
+            # Treesitter
+            nvim-treesitter.withAllGrammars
 
-      # Dependencies for neovim plugins
-      nodejs # Required for some LSP servers
-      git # For lazy.nvim
-      
-      # Language Servers (matching init.lua configuration)
-      bash-language-server      # bashls
-      clang-tools              # clangd
-      cmake-language-server    # cmake
-      omnisharp-roslyn        # csharp_ls
-      emmet-language-server   # emmet_ls
-      fsautocomplete          # fsautocomplete
-      haskell-language-server # hls
-      pyright                 # pyright
-      rust-analyzer           # rust_analyzer
-      tailwindcss-language-server # tailwindcss
-      typescript-language-server  # tsserver
-      terraform-ls            # terraformls
-      lua-language-server     # lua_ls
-      
-      # Tree-sitter dependencies
-      tree-sitter
-      
-      # Additional tools needed by plugins
-      lazygit # For lazygit.nvim
-      fzf # For telescope-fzf-native
-    ];
-  in {
-    devShells.${system}.default = pkgs.mkShell {
-      packages = commonPackages;
+            # Git integration
+            lazygit-nvim
+
+            # LSP and completion
+            nvim-lspconfig
+            nvim-cmp
+            cmp-buffer
+            cmp-path
+            cmp_luasnip
+            cmp-nvim-lsp
+            cmp-nvim-lua
+
+            # Snippets
+            luasnip
+            friendly-snippets
+
+            # UI enhancements
+            lualine-nvim
+            dressing-nvim
+            nvim-notify
+            vim-config-local
+            trouble-nvim
+            
+            # Theme
+            catppuccin-nvim
+          ];
+        };
+      };
     };
+  in {
+    packages.${system}.default = pkgs.buildEnv {
+      name = "dev-environment";
+      paths = with pkgs; [
+        # Development tools
+        cmake
+        ripgrep
+        zlib
+        zlib.dev
+        pkg-config
 
-    homeConfigurations."idobbins" = home-manager.lib.homeManagerConfiguration {
-      inherit pkgs;
-      
-      modules = [{
-        home = {
-          username = "idobbins";
-          homeDirectory = "/Users/idobbins";
-          packages = commonPackages;
-          stateVersion = "23.11";
-        };
+        # Languages and tooling
+        python3
+        poetry
+        black
+
+        # Rust tooling
+        cargo
+        rustc
+        clippy
+        rustfmt
         
-        programs.home-manager.enable = true;
+        # Haskell tooling
+        ghc
+        cabal-install
+        haskellPackages.ghcid
 
-        programs.zsh = {
-          enable = true;
-          initExtra = ''
-            export C_INCLUDE_PATH="$HOME/.nix-profile/include:$C_INCLUDE_PATH"
-          '';
-        };
-
-        programs.neovim = {
-          enable = true;
-          viAlias = true;
-          vimAlias = true;
-          defaultEditor = true;
-          extraLuaConfig = ''
-            ${builtins.readFile ./nvim/init.lua}
-          '';
-        };
-      }];
+        # Dependencies for neovim plugins
+        nodejs
+        git
+        
+        # Language Servers
+        bash-language-server
+        clang-tools
+        cmake-language-server
+        omnisharp-roslyn
+        emmet-language-server
+        fsautocomplete
+        haskell-language-server
+        pyright
+        rust-analyzer
+        tailwindcss-language-server
+        typescript-language-server
+        terraform-ls
+        lua-language-server
+        
+        # Tree-sitter dependencies
+        tree-sitter
+        
+        # Additional tools
+        lazygit
+        fzf
+        customNeovim  # Use our custom neovim instead of the default one
+      ];
+      
+      pathsToLink = [ "/bin" "/share" "/lib" "/include" ];
+      extraOutputsToInstall = [ "dev" ];
     };
   };
 }
