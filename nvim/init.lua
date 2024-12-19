@@ -107,7 +107,7 @@ vim.o.termguicolors = true
 vim.o.splitright = true
 
 require("catppuccin").setup({
-    flavour = "mocha", -- Choose your preferred flavor: latte, frappe, macchiato, mocha
+    flavour = "macchiato", -- Choose your preferred flavor: latte, frappe, macchiato, mocha
     term_colors = true,
     color_overrides = {},
 })
@@ -176,18 +176,17 @@ end)
 require('mason').setup({})
 require('mason-lspconfig').setup({
   ensure_installed = {
-    --'bashls',
-    --'clangd',
-    --'cmake',
-    --'csharp_ls',
-    --'emmet_ls',
-    --'fsautocomplete',
+    'bashls',
+    'clangd',
+    'cmake',
+    'csharp_ls',
+    'emmet_ls',
     'hls',
-    --'pyright',
-    --'rust_analyzer',
-    --'tailwindcss',
-    --'tsserver',
-    --'terraformls',
+    'pyright',
+    'rust_analyzer',
+    'tailwindcss',
+    'ts_ls',
+    'terraformls',
   },
   handlers = {
     lsp_zero.default_setup,
