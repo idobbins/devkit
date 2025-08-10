@@ -107,7 +107,7 @@ vim.o.termguicolors = true
 vim.o.splitright = true
 
 require("catppuccin").setup({
-    flavour = "macchiato", -- Choose your preferred flavor: latte, frappe, macchiato, mocha
+    flavour = "latte", -- Choose your preferred flavor: latte, frappe, macchiato, mocha
     term_colors = true,
     color_overrides = {},
 })
