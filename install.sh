@@ -4,7 +4,7 @@ set -e
 
 NVIM_CONFIG_DIR="$HOME/.config/nvim"
 BACKUP_DIR="$HOME/.config/nvim.backup.$(date +%s)"
-REPO_URL="https://raw.githubusercontent.com/idobbins/env/refs/heads/dev"
+REPO_URL="https://idobbins.github.io/env/"
 
 echo "🚀 Installing neovim config..."
 
