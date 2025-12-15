@@ -3,7 +3,7 @@ vim.g.mapleader = " "
 
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
   vim.fn.system({
     "git", "clone", "--filter=blob:none",
     "https://github.com/folke/lazy.nvim.git",
@@ -18,7 +18,6 @@ require("lazy").setup({
 
   {
     "nvim-telescope/telescope.nvim",
-    tag = "0.1.4",
     dependencies = { "nvim-lua/plenary.nvim", "kyazdani42/nvim-web-devicons" },
     config = function()
       local telescope = require("telescope")
@@ -49,7 +48,7 @@ require("lazy").setup({
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
     opts = {
-      ensure_installed = { "lua", "vim", "vimdoc", "query", "haskell", "python", "javascript", "typescript", "c", "cpp" },
+      ensure_installed = { "lua", "vim", "vimdoc", "query", "haskell", "python", "javascript", "typescript", "c", "cpp", "sql" },
       auto_install = false,
       highlight = { enable = true },
     },
@@ -62,6 +61,7 @@ require("lazy").setup({
 
   "williamboman/mason.nvim",
   "williamboman/mason-lspconfig.nvim",
+  "neovim/nvim-lspconfig",
 
   "hrsh7th/nvim-cmp",
   "hrsh7th/cmp-buffer",
@@ -94,6 +94,8 @@ require("lazy").setup({
     dependencies = { "kyazdani42/nvim-web-devicons" },
     opts = { icons = true },
   },
+
+  { "j-hui/fidget.nvim", opts = {} },
 
   {
     "projekt0n/github-nvim-theme",
@@ -145,8 +147,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
     local opts = { buffer = args.buf }
     map("n", "gd", vim.lsp.buf.definition, opts)
     map("n", "K", vim.lsp.buf.hover, opts)
-    map("n", "[d", vim.diagnostic.goto_next, opts)
-    map("n", "]d", vim.diagnostic.goto_prev, opts)
+    map("n", "[d", vim.diagnostic.goto_prev, opts)
+    map("n", "]d", vim.diagnostic.goto_next, opts)
     map("n", "gr", vim.lsp.buf.references, opts)
     map("n", "<leader>rn", vim.lsp.buf.rename, opts)
     map("n", "<leader>ca", vim.lsp.buf.code_action, opts)
@@ -179,18 +181,26 @@ local servers = {
   },
 }
 
-require("mason").setup()
-require("mason-lspconfig").setup({ ensure_installed = vim.tbl_keys(servers) })
-
+-- Configure each server using vim.lsp.config (Neovim 0.11+)
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
 for server, config in pairs(servers) do
   vim.lsp.config(server, vim.tbl_extend("force", { capabilities = capabilities }, config))
-  vim.lsp.enable(server)
 end
+
+require("mason").setup()
+require("mason-lspconfig").setup({
+  ensure_installed = vim.tbl_keys(servers),
+  automatic_enable = true,  -- Auto-enables servers via vim.lsp.enable()
+})
 
 -- Completion
 local cmp = require("cmp")
 cmp.setup({
+  snippet = {
+    expand = function(args)
+      require("luasnip").lsp_expand(args.body)
+    end,
+  },
   sources = {
     { name = "path" },
     { name = "nvim_lsp" },
