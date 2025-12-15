@@ -1,0 +1,6 @@
+README\.md
+Brewfile
+setup\.sh
+uninstall\.sh
+\.stow-local-ignore
+.*\.itermcolors
