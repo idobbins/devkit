@@ -69,3 +69,22 @@ git pull --recurse-submodules
 1. Move the file into `.dotfiles/` mirroring its home path
 2. Run `stow -t ~ .` to create symlink
 3. Commit and push
+
+## Uninstall
+
+Remove all symlinks (keeps dotfiles repo intact):
+
+```bash
+cd ~/.dotfiles && stow -t ~ -D .
+```
+
+Or run the uninstall script:
+
+```bash
+~/.dotfiles/uninstall.sh
+```
+
+This will:
+- Remove all symlinks created by stow
+- Restore any `.bak` files created during setup
+- Leave the `~/.dotfiles` repo in place for re-installation
