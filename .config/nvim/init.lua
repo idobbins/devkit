@@ -96,10 +96,11 @@ require("lazy").setup({
   },
 
   {
-    "catppuccin/nvim",
-    name = "catppuccin",
+    "projekt0n/github-nvim-theme",
     priority = 1000,
-    opts = { flavour = "macchiato", term_colors = true },
+    config = function()
+      require("github-theme").setup({})
+    end,
   },
 
   {
@@ -128,8 +129,8 @@ vim.opt.autoindent = true
 vim.opt.termguicolors = true
 vim.opt.splitright = true
 
--- Colorscheme
-vim.cmd.colorscheme("catppuccin")
+-- Colorscheme (options: github_dark, github_dark_dimmed, github_dark_high_contrast, github_light, github_light_high_contrast)
+vim.cmd.colorscheme("github_dark_dimmed")
 
 -- Keymaps
 local map = vim.keymap.set
