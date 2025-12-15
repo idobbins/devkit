@@ -24,7 +24,7 @@ fi
 
 # 3. Homebrew packages
 echo "==> Installing Homebrew packages..."
-brew bundle --file=~/.dotfiles/Brewfile --no-lock
+brew bundle --file=~/.dotfiles/Brewfile
 
 # 4. Oh My Zsh
 if [ ! -d "$HOME/.oh-my-zsh" ]; then

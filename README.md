@@ -5,7 +5,7 @@ Personal system configuration managed with [GNU Stow](https://www.gnu.org/softwa
 ## Quick Start
 
 ```bash
-git clone --recursive git@github.com:idobbins/env.git ~/.dotfiles
+git clone --recursive git@github.com:idobbins/.dotfiles.git ~/.dotfiles
 ~/.dotfiles/setup.sh
 ```
 
@@ -27,7 +27,7 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 ### 3. Clone Dotfiles
 
 ```bash
-git clone --recursive git@github.com:idobbins/env.git ~/.dotfiles
+git clone --recursive git@github.com:idobbins/.dotfiles.git ~/.dotfiles
 ```
 
 ### 4. Install Packages
