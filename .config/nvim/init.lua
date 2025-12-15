@@ -24,7 +24,10 @@ require("lazy").setup({
       local actions = require("telescope.actions")
       telescope.setup({
         defaults = {
-          file_ignore_patterns = { "node_modules", ".git/", "%.lock", "build/", "dist/", "target/", "%.o", "%.a" },
+          file_ignore_patterns = {
+            "node_modules", ".git/", "%.lock", "build/", "dist/", "target/", "%.o", "%.a",
+            "Library/", ".Trash/", ".cache/", ".npm/", ".cargo/", "%.app/",
+          },
           path_display = { "truncate" },
           layout_strategy = "horizontal",
           sorting_strategy = "ascending",
@@ -52,7 +55,7 @@ require("lazy").setup({
         },
         pickers = {
           find_files = {
-            find_command = { "fd", "--type", "f", "--hidden", "--exclude", ".git" },
+            find_command = { "rg", "--files", "--hidden", "--glob", "!.git/*" },
           },
         },
         extensions = {
