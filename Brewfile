@@ -1,4 +1,5 @@
-brew "chezmoi"
+brew "aws-sam-cli"
+brew "awscli"
 brew "cmake"
 brew "direnv"
 brew "fzf"
