@@ -1,7 +1,4 @@
-# Homebrew Bundle
-# Install with: brew bundle --file=~/.dotfiles/Brewfile
-
-# Formulae
+brew "chezmoi"
 brew "cmake"
 brew "direnv"
 brew "fzf"
@@ -12,7 +9,5 @@ brew "starship"
 brew "stow"
 brew "tmux"
 brew "tree"
-
-# Casks
 cask "claude-code"
 cask "orbstack"
