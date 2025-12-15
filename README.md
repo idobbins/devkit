@@ -64,6 +64,14 @@ cd ~/.dotfiles
 git pull --recurse-submodules
 ```
 
+## Refresh Symlinks
+
+After adding or changing files, restow to update symlinks:
+
+```bash
+cd ~/.dotfiles && stow -t ~ -R .
+```
+
 ## Add New Config
 
 1. Move the file into `.dotfiles/` mirroring its home path
