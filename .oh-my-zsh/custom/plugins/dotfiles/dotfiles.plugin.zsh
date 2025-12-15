@@ -11,31 +11,38 @@ dfbrew() {
 
 # Refresh stow symlinks (unstow + restow)
 dfstow() {
+  pushd -q "$DOTFILES_DIR"
   echo "==> Refreshing stow symlinks..."
-  cd "$DOTFILES_DIR" && stow -t ~ -D . && stow -t ~ .
+  stow -t ~ -D . && stow -t ~ .
   echo "==> Done."
+  popd -q
 }
 
 # Show dotfiles git status
 dfstatus() {
-  cd "$DOTFILES_DIR" && git status
+  pushd -q "$DOTFILES_DIR"
+  git status
+  popd -q
 }
 
 # Full sync: pull + update submodules + refresh stow
 dfsync() {
+  pushd -q "$DOTFILES_DIR"
   echo "==> Pulling latest changes..."
-  cd "$DOTFILES_DIR" && git pull --recurse-submodules
+  git pull --recurse-submodules
   echo "==> Refreshing stow symlinks..."
-  dfstow
+  stow -t ~ -D . && stow -t ~ .
   echo "==> Sync complete."
+  popd -q
 }
 
 # Add, commit, and push dotfiles changes
 dfpush() {
-  cd "$DOTFILES_DIR"
+  pushd -q "$DOTFILES_DIR"
   git add -A
   git status
   echo ""
   read "msg?Commit message: "
   git commit -m "$msg" && git push
+  popd -q
 }
