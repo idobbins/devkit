@@ -1,6 +1,11 @@
 [user]
     name = Isaac Dobbins
-    email = isaac.dobbins@icloud.com
+	email = isaac@fundlaunch.com
 
 [includeIf "gitdir:~/dev/fundlaunch/"]
     path = ~/.gitconfig-fundlaunch
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true

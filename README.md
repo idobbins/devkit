@@ -57,6 +57,64 @@ cd ~/.dotfiles && stow -t ~ .
 - `.oh-my-zsh/custom/plugins/` - Zsh plugins (as submodules)
 - `Brewfile` - Homebrew dependencies
 
+## Neovim Keybinds
+
+Leader key is `<Space>`.
+
+### General
+
+| Keybind | Action |
+|---------|--------|
+| `<leader>m` | Show marks |
+
+### Telescope
+
+| Keybind | Action |
+|---------|--------|
+| `<leader>ff` | Find files |
+| `<leader>fg` | Live grep |
+| `<leader>fh` | Help tags |
+| `<leader>fr` | LSP references |
+| `<leader>fb` | Buffers |
+| `<leader>fo` | Recent files |
+| `<leader>fd` | Diagnostics |
+| `<leader>fc` | Git commits |
+| `<leader>fs` | Git status |
+| `<leader>f.` | Resume last search |
+| `<leader>/` | Fuzzy find in current buffer |
+
+**Inside Telescope picker:**
+
+| Keybind | Mode | Action |
+|---------|------|--------|
+| `<C-j>` | Insert | Next result |
+| `<C-k>` | Insert | Previous result |
+| `<C-q>` | Both | Send selected to quickfix |
+| `q` | Normal | Close picker |
+
+### LSP
+
+Available when an LSP server is attached to the buffer.
+
+| Keybind | Action |
+|---------|--------|
+| `gd` | Go to definition |
+| `K` | Hover documentation |
+| `[d` | Previous diagnostic |
+| `]d` | Next diagnostic |
+| `gr` | References |
+| `<leader>rn` | Rename symbol |
+| `<leader>ca` | Code action |
+
+### Completion (nvim-cmp)
+
+| Keybind | Action |
+|---------|--------|
+| `<C-n>` | Next item |
+| `<C-p>` | Previous item |
+| `<C-y>` | Confirm selection |
+| `<C-Space>` | Trigger completion |
+
 ## Update
 
 ```bash

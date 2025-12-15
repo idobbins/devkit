@@ -21,9 +21,10 @@ require("lazy").setup({
     dependencies = { "nvim-lua/plenary.nvim", "kyazdani42/nvim-web-devicons" },
     config = function()
       local telescope = require("telescope")
+      local actions = require("telescope.actions")
       telescope.setup({
         defaults = {
-          file_ignore_patterns = { "node_modules" },
+          file_ignore_patterns = { "node_modules", ".git/", "%.lock", "build/", "dist/", "target/", "%.o", "%.a" },
           path_display = { "truncate" },
           layout_strategy = "horizontal",
           sorting_strategy = "ascending",
@@ -32,7 +33,35 @@ require("lazy").setup({
             width = 0.87,
             height = 0.80,
           },
-          mappings = { n = { ["q"] = require("telescope.actions").close } },
+          vimgrep_arguments = {
+            "rg", "--color=never", "--no-heading", "--with-filename",
+            "--line-number", "--column", "--smart-case", "--hidden",
+            "--glob", "!.git/*",
+          },
+          mappings = {
+            i = {
+              ["<C-j>"] = actions.move_selection_next,
+              ["<C-k>"] = actions.move_selection_previous,
+              ["<C-q>"] = actions.send_selected_to_qflist + actions.open_qflist,
+            },
+            n = {
+              ["q"] = actions.close,
+              ["<C-q>"] = actions.send_selected_to_qflist + actions.open_qflist,
+            },
+          },
+        },
+        pickers = {
+          find_files = {
+            find_command = { "fd", "--type", "f", "--hidden", "--exclude", ".git" },
+          },
+        },
+        extensions = {
+          fzf = {
+            fuzzy = true,
+            override_generic_sorter = true,
+            override_file_sorter = true,
+            case_mode = "smart_case",
+          },
         },
       })
       telescope.load_extension("fzf")
@@ -141,6 +170,13 @@ map("n", "<leader>ff", function() require("telescope.builtin").find_files() end)
 map("n", "<leader>fg", function() require("telescope.builtin").live_grep() end)
 map("n", "<leader>fh", function() require("telescope.builtin").help_tags() end)
 map("n", "<leader>fr", function() require("telescope.builtin").lsp_references() end)
+map("n", "<leader>fb", function() require("telescope.builtin").buffers() end)
+map("n", "<leader>fo", function() require("telescope.builtin").oldfiles() end)
+map("n", "<leader>fd", function() require("telescope.builtin").diagnostics() end)
+map("n", "<leader>fc", function() require("telescope.builtin").git_commits() end)
+map("n", "<leader>fs", function() require("telescope.builtin").git_status() end)
+map("n", "<leader>f.", function() require("telescope.builtin").resume() end)
+map("n", "<leader>/", function() require("telescope.builtin").current_buffer_fuzzy_find() end)
 
 vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(args)
