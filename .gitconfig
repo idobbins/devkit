@@ -1,0 +1,6 @@
+[user]
+    name = Isaac Dobbins
+    email = isaac.dobbins@icloud.com
+
+[includeIf "gitdir:~/dev/fundlaunch/"]
+    path = ~/.gitconfig-fundlaunch
