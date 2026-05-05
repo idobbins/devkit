@@ -21,7 +21,10 @@
       ".localrc"
     ];
     settings = {
-      user.name = "Isaac Dobbins";
+      user = {
+        name = "Isaac Dobbins";
+        email = "isaac.dobbins@icloud.com";
+      };
       core.editor = "nvim";
       init.defaultBranch = "main";
       pull.rebase = false;
