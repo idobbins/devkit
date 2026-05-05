@@ -1,6 +1,6 @@
 # Devkit Dotfiles
 
-Portable Nix-powered dev environment for macOS and Linux.
+Portable Nix-powered dev environment for macOS, guest/non-NixOS Linux, and full NixOS machines.
 
 ## Quick start
 
@@ -23,13 +23,14 @@ TAILSCALE_AUTHKEY=tskey-auth-... bash -c "$(curl -fsSL https://raw.githubusercon
 
 ## What bootstrap does
 
-- installs Determinate Nix if missing
+- installs Determinate Nix if missing, except on NixOS where Nix is assumed to exist
 - on Ubuntu/Debian, runs `apt-get update && apt-get -y upgrade` and installs bootstrap deps
-- optionally installs/joins Tailscale when `TAILSCALE_AUTHKEY` is set or `--tailscale` is passed
+- optionally installs/joins Tailscale on non-NixOS Linux when `TAILSCALE_AUTHKEY` is set or `--tailscale` is passed
 - clones/pulls this repo
 - applies the Nix flake:
   - macOS: `nix-darwin` target `#macos`
-  - Linux: Home Manager target `#linux`
+  - guest/non-NixOS Linux: Home Manager target `#linux`
+  - NixOS: system target `#nixos`
 - creates `~/.ssh/id_ed25519` only if missing
 - prints next auth steps and your SSH public key
 
@@ -38,6 +39,14 @@ Skip OS upgrades:
 ```bash
 ~/.devkit/bootstrap.sh --no-upgrade
 ```
+
+## Supported modes
+
+- `#macos`: macOS through nix-darwin + Home Manager.
+- `#linux`: non-NixOS Linux through standalone Home Manager.
+- `#nixos`: full NixOS machines through `nixos-rebuild`.
+
+Shared user tooling lives in `modules/home`. NixOS system services and users live in `modules/nixos`. Real NixOS hardware, bootloader, disks, filesystems, hostname, and host-specific networking should live under `hosts/machines/<name>/`; see `hosts/machines/example/`.
 
 ## Managed by Nix
 
@@ -106,6 +115,8 @@ tunnel --keep devbox 3000
 Normally use `devkit apply`. If you need the raw commands:
 
 ```bash
+devkit apply
+sudo nixos-rebuild switch --flake ~/.devkit#nixos
 nix --option nix-path "" run home-manager -- switch --flake ~/.devkit#linux --impure
 nix --option nix-path "" run nix-darwin -- switch --flake ~/.devkit#macos --impure
 ```

@@ -41,5 +41,13 @@
         specialArgs = { inherit inputs username; homeDirectory = darwinHome; };
         modules = [ ./hosts/macos.nix ];
       };
+
+      nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
+        system = linuxSystem;
+        specialArgs = { inherit inputs username; homeDirectory = "/home/${username}"; };
+        modules = [ ./hosts/nixos.nix ];
+      };
+
+      nixosModules.devkit = ./modules/nixos;
     };
 }

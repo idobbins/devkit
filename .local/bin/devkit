@@ -36,10 +36,14 @@ require_repo() {
   [[ -d "$DEVKIT_HOME/.git" ]] || die "devkit repo not found at $DEVKIT_HOME"
 }
 
+is_nixos() { [[ -e /etc/NIXOS ]]; }
+
 target_name() {
   case "$(uname -s)" in
     Darwin) printf 'macos' ;;
-    Linux) printf 'linux' ;;
+    Linux)
+      if is_nixos; then printf 'nixos'; else printf 'linux'; fi
+      ;;
     *) die "unsupported OS: $(uname -s)" ;;
   esac
 }
@@ -70,6 +74,10 @@ apply_config() {
     linux)
       log "Applying Home Manager config: $DEVKIT_HOME#linux"
       nix --option nix-path "" run home-manager -- switch --flake "$DEVKIT_HOME#linux" --impure
+      ;;
+    nixos)
+      log "Applying NixOS config: $DEVKIT_HOME#nixos"
+      sudo nixos-rebuild switch --flake "$DEVKIT_HOME#nixos"
       ;;
   esac
 }
@@ -118,7 +126,14 @@ doctor() {
 
   case "$(uname -s)" in
     Darwin) check "macOS target is selected" "true" ;;
-    Linux) check "Linux target is selected" "true" ;;
+    Linux)
+      if is_nixos; then
+        check "NixOS target is selected" "true"
+        check "nixos-rebuild is available" "command -v nixos-rebuild"
+      else
+        check "Linux Home Manager target is selected" "true"
+      fi
+      ;;
     *) check "supported OS" "false" ;;
   esac
 
