@@ -20,11 +20,14 @@ Workstation commands:
 
 Project helpers:
   project-info [DIR] Show detected project commands/tools
+  attach [--keep] [--open] HOST REMOTE_DIR
+                     Forward a remote project's manifest ports to local localhost
 
 Examples:
   devkit update
   devkit apply
   devkit project-info ~/dev/i7/notoil
+  devkit attach --keep --open fort /home/ian/project
 EOF
 }
 
@@ -173,6 +176,86 @@ pi_sync() {
   log "Run /reload in pi, or restart pi, to load extensions"
 }
 
+attach_project() {
+  keep=0
+  open=0
+  manifest=""
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -k|--keep) keep=1; shift ;;
+      --open) open=1; shift ;;
+      --manifest)
+        [[ $# -ge 2 ]] || die "--manifest requires a remote manifest path"
+        manifest="$2"; shift 2 ;;
+      -h|--help)
+        cat <<'EOF'
+Usage: devkit attach [--keep] [--open] [--manifest REMOTE_MANIFEST] HOST REMOTE_DIR
+
+Forward ports from a remote project manifest into this machine's localhost.
+Defaults to REMOTE_DIR/.fundlaunch/manifest.json, falling back to
+REMOTE_DIR/.fundlaunch/tunnels.json and REMOTE_DIR/.devkit/tunnels.json.
+
+Examples:
+  devkit attach fort /home/ian/project
+  devkit attach --keep --open fort /home/ian/project
+  devkit attach --manifest /home/ian/project/.fundlaunch/manifest.json fort /home/ian/project
+EOF
+        return 0 ;;
+      --) shift; break ;;
+      -*) die "unknown attach option: $1" ;;
+      *) break ;;
+    esac
+  done
+
+  [[ $# -eq 2 ]] || die "usage: devkit attach [--keep] [--open] HOST REMOTE_DIR"
+  host="$1"
+  remote_dir="${2%/}"
+
+  have ssh || die "ssh is required"
+  have tunnel || die "tunnel is required; run 'devkit apply' to install it"
+
+  if [[ -z "$manifest" ]]; then
+    manifest="$(
+      ssh "$host" sh -s -- "$remote_dir" <<'EOF'
+set -eu
+root="$1"
+for candidate in \
+  "$root/.fundlaunch/manifest.json" \
+  "$root/.fundlaunch/tunnels.json" \
+  "$root/.devkit/tunnels.json" \
+  "$root/tunnels.json"; do
+  if [ -f "$candidate" ]; then
+    printf '%s\n' "$candidate"
+    exit 0
+  fi
+done
+exit 1
+EOF
+    )" || die "no tunnel manifest found on $host under $remote_dir"
+  fi
+
+  log "Attaching $host:$remote_dir"
+  log "Manifest: $manifest"
+
+  if [[ "$open" -eq 1 ]]; then
+    url="$(ssh "$host" sh -c 'jq -r '\''(.urls.frontend // .urls.app // empty)'\'' "$1" 2>/dev/null' sh "$manifest" || true)"
+    if [[ -n "$url" && "$url" != "null" ]]; then
+      (
+        sleep 2
+        case "$(uname -s)" in
+          Darwin) open "$url" >/dev/null 2>&1 || true ;;
+          Linux) xdg-open "$url" >/dev/null 2>&1 || true ;;
+        esac
+      ) &
+    fi
+  fi
+
+  args=()
+  [[ "$keep" -eq 1 ]] && args+=(--keep)
+  exec tunnel "${args[@]}" "$host" --remote-manifest "$manifest"
+}
+
 project_info() {
   dir="${1:-$PWD}"
   [[ -d "$dir" ]] || die "not a directory: $dir"
@@ -220,6 +303,7 @@ case "$cmd" in
   gc) shift; gc_nix "$@" ;;
   path) shift; printf '%s\n' "$DEVKIT_HOME" ;;
   pi-sync) shift; pi_sync "$@" ;;
+  attach) shift; attach_project "$@" ;;
   project-info) shift; project_info "$@" ;;
   -h|--help|help|'') usage ;;
   *) usage >&2; die "unknown command: $cmd" ;;

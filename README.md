@@ -118,6 +118,12 @@ tunnel fort --manifest .devkit/tunnels.json
 tunnel fort --remote-manifest /home/ian/project/.devkit/tunnels.json
 ```
 
+For project manifests on a remote tailnet node, use `devkit attach` from the client machine. It discovers `.fundlaunch/manifest.json`, `.fundlaunch/tunnels.json`, or `.devkit/tunnels.json` under the remote project directory and forwards those ports into client-local `localhost`:
+
+```bash
+devkit attach --keep --open fort /home/ian/project
+```
+
 Manifest format:
 
 ```json
@@ -148,10 +154,10 @@ Then restart pi or run `/reload`. The first extension adds:
 /tunnels
 ```
 
-Run `/tunnels` from a project with `.devkit/tunnels.json` to print the client-side command, e.g.:
+Run `/tunnels` from a project with `.fundlaunch/manifest.json` or `.devkit/tunnels.json` to print the client-side command, e.g.:
 
 ```bash
-tunnel fort --remote-manifest /home/ian/project/.devkit/tunnels.json
+devkit attach --keep --open fort /home/ian/project
 ```
 
 ## Direct flake commands
