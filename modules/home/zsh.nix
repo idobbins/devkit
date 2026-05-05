@@ -1,0 +1,41 @@
+{ ... }:
+{
+  programs.zsh = {
+    enable = true;
+    autosuggestion.enable = true;
+    syntaxHighlighting.enable = true;
+    enableCompletion = true;
+    history = { path = "$HOME/.zsh_history"; size = 50000; save = 50000; share = true; };
+    shellAliases = {
+      g = "git"; ga = "git add"; gaa = "git add --all"; gc = "git commit";
+      gcm = "git commit -m"; gco = "git checkout"; gd = "git diff";
+      gl = "git pull"; gp = "git push"; gst = "git status";
+      grt = ''cd "$(git rev-parse --show-toplevel 2>/dev/null || echo .)"'';
+      vim = "nvim"; cat = "bat"; ls = "eza --group-directories-first";
+      ll = "eza -la --group-directories-first --git";
+    };
+    initContent = ''
+      typeset -U path PATH
+      for dir in "$HOME/.local/bin" "$HOME/bin" "$HOME/.cargo/bin" "$HOME/.bun/bin" "$HOME/.deno/bin" "$HOME/Library/pnpm" "$HOME/.local/share/pnpm" "/opt/homebrew/bin" "/usr/local/bin"; do
+        [[ -d "$dir" ]] && path=("$dir" $path)
+      done
+      unset dir
+
+      setopt prompt_subst auto_cd interactive_comments hist_ignore_dups hist_ignore_space share_history
+      export EDITOR="nvim" VISUAL="nvim" PAGER="less" LESS="-R"
+
+      autoload -Uz vcs_info add-zsh-hook
+      zstyle ':vcs_info:git:*' formats ' %F{blue}git:(%F{red}%b%F{blue})%f'
+      zstyle ':vcs_info:git:*' actionformats ' %F{blue}git:(%F{red}%b|%a%F{blue})%f'
+      _precmd_vcs_info() { vcs_info; }
+      add-zsh-hook precmd _precmd_vcs_info
+      PROMPT='%(?.%F{green}➜.%F{red}➜) %F{cyan}%1~%f''${vcs_info_msg_0_} '
+
+      command -v direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"
+      [[ -r "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+    '';
+  };
+
+  programs.fzf.enable = true;
+  programs.direnv.enable = true;
+}

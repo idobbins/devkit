@@ -16,17 +16,9 @@
 Session.vim
 .netrwhist
 
-# SSH private keys (keep public keys)
-.ssh/id_*
-!.ssh/id_*.pub
-.ssh/known_hosts
-.ssh/known_hosts.old
-.ssh/config.local
-
-# Local/machine-specific overrides
-.zshrc.local
-.gitconfig.local
-.localrc
-
 # Logs
 *.log
+
+# Local/machine-specific overrides
+*.local
+.localrc

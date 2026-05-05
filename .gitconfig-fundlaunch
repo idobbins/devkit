@@ -1,5 +1,0 @@
-[user]
-    email = isaac@fundlaunch.com
-
-[core]
-    sshCommand = ssh -i ~/.ssh/id_ed25519_fundlaunch -o IdentitiesOnly=yes

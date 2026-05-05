@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage:
+  tunnel [--keep] HOST PORT [PORT...]
+  tunnel [--keep] HOST LOCAL:REMOTE [LOCAL:REMOTE...]
+
+Examples:
+  tunnel devbox 3000
+  tunnel devbox 3000 5173 8000
+  tunnel devbox 8080:3000
+
+Forwards local browser traffic to apps running on a remote machine:
+  localhost:3000 -> devbox:localhost:3000
+  localhost:8080 -> devbox:localhost:3000
+
+Options:
+  -k, --keep    Use autossh to keep the tunnel alive.
+  -h, --help    Show this help.
+EOF
+}
+
+keep=0
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -k|--keep) keep=1; shift ;;
+    -h|--help) usage; exit 0 ;;
+    --) shift; break ;;
+    -*) echo "Unknown option: $1" >&2; usage >&2; exit 2 ;;
+    *) break ;;
+  esac
+done
+
+if [[ $# -lt 2 ]]; then
+  usage >&2
+  exit 2
+fi
+
+host="$1"
+shift
+
+forwards=()
+for spec in "$@"; do
+  if [[ "$spec" =~ ^([0-9]+):([0-9]+)$ ]]; then
+    local_port="${BASH_REMATCH[1]}"
+    remote_port="${BASH_REMATCH[2]}"
+  elif [[ "$spec" =~ ^([0-9]+)$ ]]; then
+    local_port="$spec"
+    remote_port="$spec"
+  else
+    echo "Invalid port spec: $spec" >&2
+    echo "Use PORT or LOCAL:REMOTE, e.g. 3000 or 8080:3000" >&2
+    exit 2
+  fi
+
+  forwards+=("-L" "127.0.0.1:${local_port}:127.0.0.1:${remote_port}")
+  echo "localhost:${local_port} -> ${host}:localhost:${remote_port}"
+done
+
+cmd=(ssh -N -T -o ExitOnForwardFailure=yes "${forwards[@]}" "$host")
+
+if [[ "$keep" -eq 1 ]]; then
+  if ! command -v autossh >/dev/null 2>&1; then
+    echo "autossh is required for --keep. Install it or run without --keep." >&2
+    exit 1
+  fi
+  cmd=(autossh -M 0 "${cmd[@]:1}")
+fi
+
+echo "Starting tunnel. Press Ctrl+C to stop."
+exec "${cmd[@]}"

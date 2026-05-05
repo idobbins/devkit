@@ -1,18 +1,10 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-echo "==> Removing dotfiles symlinks..."
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-cd ~/.dotfiles && stow -t ~ -D .
+echo "==> Removing dotfiles symlinks from $HOME"
+(cd "$DOTFILES_DIR" && stow --delete --target="$HOME" .)
 
-echo "==> Restoring backup files..."
-
-for file in .zshrc .gitconfig .gitconfig-fundlaunch; do
-    if [ -f "$HOME/$file.bak" ]; then
-        echo "    Restoring ~/$file from ~/$file.bak"
-        mv "$HOME/$file.bak" "$HOME/$file"
-    fi
-done
-
-echo "==> Done! Dotfiles repo remains at ~/.dotfiles"
-echo "    To fully remove: rm -rf ~/.dotfiles"
+echo "==> Dotfiles repo remains at $DOTFILES_DIR"
+echo "    Backups created by setup are left in place (*.bak.TIMESTAMP)."

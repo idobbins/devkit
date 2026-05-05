@@ -1,6 +1,9 @@
 \.git
+\.gitignore
+\.gitmodules
 README\.md
 Brewfile
+packages
 setup\.sh
 uninstall\.sh
 \.stow-local-ignore

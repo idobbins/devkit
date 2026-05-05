@@ -1,106 +1,126 @@
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
+# Fast, portable zsh config. No Oh My Zsh startup path.
 
-# Path to your Oh My Zsh installation.
-export ZSH="$HOME/.oh-my-zsh"
+typeset -U path PATH
 
-# Set name of the theme to load --- if set to "random", it will
-# load a random theme each time Oh My Zsh is loaded, in which case,
-# to know which specific one was loaded, run: echo $RANDOM_THEME
-# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="robbyrussell"
+# Portable user paths first.
+for dir in \
+  "$HOME/.local/bin" \
+  "$HOME/bin" \
+  "$HOME/.cargo/bin" \
+  "$HOME/.bun/bin" \
+  "$HOME/.deno/bin" \
+  "/opt/homebrew/bin" \
+  "/usr/local/bin"
+do
+  [[ -d "$dir" ]] && path=("$dir" $path)
+done
+unset dir
 
-# Set list of themes to pick from when loading at random
-# Setting this variable when ZSH_THEME=random will cause zsh to load
-# a theme from this variable instead of looking in $ZSH/themes/
-# If set to an empty array, this variable will have no effect.
-# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
+setopt prompt_subst
+setopt auto_cd
+setopt interactive_comments
+setopt hist_ignore_dups
+setopt hist_ignore_space
+setopt share_history
 
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=50000
 
-# Uncomment the following line to use hyphen-insensitive completion.
-# Case-sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
+export EDITOR="nvim"
+export VISUAL="nvim"
+export PAGER="less"
+export LESS="-R"
 
-# Uncomment one of the following lines to change the auto-update behavior
-# zstyle ':omz:update' mode disabled  # disable automatic updates
-# zstyle ':omz:update' mode auto      # update automatically without asking
-# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
+# Custom completions
+fpath=(
+  "$HOME/.zsh/completions"
+  "$HOME/.oh-my-zsh/custom/completions"
+  $fpath
+)
 
-# Uncomment the following line to change how often to auto-update (in days).
-# zstyle ':omz:update' frequency 13
+# Fast completion init.
+# If completions ever seem stale, run:
+#   rm ~/.zcompdump-fast-*
+autoload -Uz compinit
+compinit -C -d "$HOME/.zcompdump-fast-${ZSH_VERSION}"
 
-# Uncomment the following line if pasting URLs and other text is messed up.
-# DISABLE_MAGIC_FUNCTIONS="true"
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}'
+zstyle ':completion:*' special-dirs true
+zstyle ':completion:*' use-cache yes
+zstyle ':completion:*' cache-path "$HOME/.zcompcache"
 
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
+# Prompt: robbyrussell-ish, but without OMZ
+autoload -Uz vcs_info add-zsh-hook
 
-# Uncomment the following line to disable auto-setting terminal title.
-# DISABLE_AUTO_TITLE="true"
+zstyle ':vcs_info:git:*' formats ' %F{blue}git:(%F{red}%b%F{blue})%f'
+zstyle ':vcs_info:git:*' actionformats ' %F{blue}git:(%F{red}%b|%a%F{blue})%f'
 
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
+_precmd_vcs_info() {
+  vcs_info
+}
+add-zsh-hook precmd _precmd_vcs_info
 
-# Uncomment the following line to display red dots whilst waiting for completion.
-# You can also set it to another string to have that shown instead of the default red dots.
-# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
-# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
-# COMPLETION_WAITING_DOTS="true"
+PROMPT='%(?.%F{green}➜.%F{red}➜) %F{cyan}%1~%f${vcs_info_msg_0_} '
 
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
+# Minimal git aliases
+alias g='git'
+alias ga='git add'
+alias gaa='git add --all'
+alias gc='git commit'
+alias gcm='git commit -m'
+alias gco='git checkout'
+alias gd='git diff'
+alias gl='git pull'
+alias gp='git push'
+alias gst='git status'
+alias grt='cd "$(git rev-parse --show-toplevel 2>/dev/null || echo .)"'
 
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# You can set one of the optional three formats:
-# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# or set a custom format using the strftime function format specifications,
-# see 'man strftime' for details.
-# HIST_STAMPS="mm/dd/yyyy"
+# Common quality-of-life aliases when tools are installed
+command -v nvim >/dev/null 2>&1 && alias vim='nvim'
+command -v bat >/dev/null 2>&1 && alias cat='bat'
+command -v eza >/dev/null 2>&1 && alias ls='eza --group-directories-first'
+command -v eza >/dev/null 2>&1 && alias ll='eza -la --group-directories-first --git'
 
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
+# pnpm home differs by platform/installer. Add both if present.
+for dir in "$HOME/Library/pnpm" "$HOME/.local/share/pnpm"; do
+  [[ -d "$dir" ]] && path=("$dir" $path)
+done
+unset dir
 
-# Which plugins would you like to load?
-# Standard plugins can be found in $ZSH/plugins/
-# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-plugins=(1password aliases aws brew copyfile cp docker docker-compose dotenv dotfiles encode64 git macos nvm postgres rsync rust ssh starship sudo uv urltools vscode you-should-use zsh-autosuggestions zsh-bat zsh-syntax-highlighting zsh-nvm z)
+# direnv
+command -v direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"
 
-source $ZSH/oh-my-zsh.sh
+# fzf shell integration
+if command -v fzf >/dev/null 2>&1; then
+  source <(fzf --zsh) 2>/dev/null || true
+fi
 
-# User configuration
+# Machine-local overrides/secrets. Keep this file untracked.
+[[ -r "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
 
-# export MANPATH="/usr/local/man:$MANPATH"
+# Lazy nvm. Keeps shell startup fast while exposing the default Node on PATH.
+export NVM_DIR="$HOME/.nvm"
 
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
+if [[ -r "$NVM_DIR/alias/default" ]]; then
+  nvm_default_version="$(<"$NVM_DIR/alias/default")"
+  nvm_default_bin="$NVM_DIR/versions/node/$nvm_default_version/bin"
+  [[ -d "$nvm_default_bin" ]] && path=("$nvm_default_bin" $path)
+  unset nvm_default_version nvm_default_bin
+fi
 
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='nvim'
-# fi
+nvm() {
+  unset -f nvm
+  [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
+  [[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
+  nvm "$@"
+}
 
-# Compilation flags
-# export ARCHFLAGS="-arch $(uname -m)"
+# Autosuggestions
+[[ -r "$HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] &&
+  source "$HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
 
-# Set personal aliases, overriding those provided by Oh My Zsh libs,
-# plugins, and themes. Aliases can be placed here, though Oh My Zsh
-# users are encouraged to define aliases within a top-level file in
-# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
-# - $ZSH_CUSTOM/aliases.zsh
-# - $ZSH_CUSTOM/macos.zsh
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
-
-export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
+# Syntax highlighting must be last
+[[ -r "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] &&
+  source "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
