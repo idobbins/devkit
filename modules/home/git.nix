@@ -4,9 +4,25 @@
     enable = true;
     userName = "Isaac Dobbins";
     lfs.enable = true;
-    ignores = [ ];
+    ignores = [
+      ".DS_Store"
+      ".AppleDouble"
+      ".LSOverride"
+      "._*"
+      "*.swp"
+      "*.swo"
+      "*~"
+      "\\#*\\#"
+      ".#*"
+      "*.un~"
+      "Session.vim"
+      ".netrwhist"
+      "*.log"
+      "*.local"
+      ".localrc"
+    ];
     extraConfig = {
-      core = { editor = "nvim"; excludesfile = "~/.config/git/ignore"; };
+      core.editor = "nvim";
       init.defaultBranch = "main";
       pull.rebase = false;
       fetch.prune = true;

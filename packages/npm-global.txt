@@ -1,4 +1,0 @@
-# command npm-package
-pi @mariozechner/pi-coding-agent
-claude @anthropic-ai/claude-code
-codex @openai/codex
