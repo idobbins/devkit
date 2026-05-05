@@ -6,19 +6,28 @@ usage() {
 Usage:
   tunnel [--keep] HOST PORT [PORT...]
   tunnel [--keep] HOST LOCAL:REMOTE [LOCAL:REMOTE...]
+  tunnel [--keep] HOST --manifest FILE
+  tunnel [--keep] HOST --remote-manifest FILE
 
 Examples:
-  tunnel devbox 3000
-  tunnel devbox 3000 5173 8000
-  tunnel devbox 8080:3000
+  tunnel fort 3000
+  tunnel fort 3000 5173 8000
+  tunnel fort 8080:3000
+  tunnel fort --manifest .devkit/tunnels.json
+  tunnel fort --remote-manifest /home/ian/project/.devkit/tunnels.json
 
 Forwards local browser traffic to apps running on a remote machine:
-  localhost:3000 -> devbox:localhost:3000
-  localhost:8080 -> devbox:localhost:3000
+  localhost:3000 -> fort:localhost:3000
+  localhost:8080 -> fort:localhost:3000
+
+Manifest format:
+  { "ports": { "frontend": 54003 }, "urls": { "frontend": "http://localhost:54003" } }
 
 Options:
-  -k, --keep    Use autossh to keep the tunnel alive.
-  -h, --help    Show this help.
+  -k, --keep              Use autossh to keep the tunnel alive.
+  --manifest FILE         Read ports from a local JSON manifest.
+  --remote-manifest FILE  Fetch JSON manifest from HOST over SSH, then tunnel its ports.
+  -h, --help              Show this help.
 EOF
 }
 
@@ -41,8 +50,79 @@ fi
 host="$1"
 shift
 
+manifest=""
+remote_manifest=""
+port_specs=()
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --manifest)
+      [[ $# -ge 2 ]] || { echo "--manifest requires a file" >&2; exit 2; }
+      manifest="$2"; shift 2 ;;
+    --remote-manifest)
+      [[ $# -ge 2 ]] || { echo "--remote-manifest requires a file" >&2; exit 2; }
+      remote_manifest="$2"; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    -*) echo "Unknown option: $1" >&2; usage >&2; exit 2 ;;
+    *) port_specs+=("$1"); shift ;;
+  esac
+done
+
+if [[ -n "$manifest" && -n "$remote_manifest" ]]; then
+  echo "Use only one of --manifest or --remote-manifest" >&2
+  exit 2
+fi
+
+if [[ -n "$manifest" || -n "$remote_manifest" ]]; then
+  if [[ "${#port_specs[@]}" -gt 0 ]]; then
+    echo "Do not combine explicit ports with manifest options" >&2
+    exit 2
+  fi
+
+  tmp="$(mktemp)"
+  trap 'rm -f "$tmp"' EXIT
+
+  if [[ -n "$manifest" ]]; then
+    [[ -f "$manifest" ]] || { echo "Manifest not found: $manifest" >&2; exit 1; }
+    cp "$manifest" "$tmp"
+    source_label="$manifest"
+  else
+    remote_quoted="$(printf '%q' "$remote_manifest")"
+    ssh "$host" "cat -- $remote_quoted" > "$tmp"
+    source_label="$host:$remote_manifest"
+  fi
+
+  if ! jq -e '.ports and (.ports | type == "object")' "$tmp" >/dev/null; then
+    echo "Manifest must contain a ports object" >&2
+    exit 1
+  fi
+
+  echo "Ports from manifest: $source_label"
+  while IFS=$'\t' read -r name port; do
+    [[ "$port" =~ ^[0-9]+$ ]] || { echo "Invalid port for $name: $port" >&2; exit 1; }
+    port_specs+=("$port")
+    printf '  %-24s localhost:%s -> %s:localhost:%s\n' "$name" "$port" "$host" "$port"
+  done < <(jq -r '.ports | to_entries[] | "\(.key)\t\(.value)"' "$tmp")
+
+  if jq -e '.urls and (.urls | type == "object") and ((.urls | length) > 0)' "$tmp" >/dev/null; then
+    echo
+    echo "URLs:"
+    while IFS=$'\t' read -r name url; do
+      printf '  %-24s %s\n' "$name" "$url"
+    done < <(jq -r '.urls | to_entries[] | "\(.key)\t\(.value)"' "$tmp")
+  fi
+
+  echo
+fi
+
+if [[ "${#port_specs[@]}" -eq 0 ]]; then
+  echo "No ports specified" >&2
+  usage >&2
+  exit 2
+fi
+
 forwards=()
-for spec in "$@"; do
+for spec in "${port_specs[@]}"; do
   if [[ "$spec" =~ ^([0-9]+):([0-9]+)$ ]]; then
     local_port="${BASH_REMATCH[1]}"
     remote_port="${BASH_REMATCH[2]}"
@@ -56,7 +136,9 @@ for spec in "$@"; do
   fi
 
   forwards+=("-L" "127.0.0.1:${local_port}:127.0.0.1:${remote_port}")
-  echo "localhost:${local_port} -> ${host}:localhost:${remote_port}"
+  if [[ -z "$manifest" && -z "$remote_manifest" ]]; then
+    echo "localhost:${local_port} -> ${host}:localhost:${remote_port}"
+  fi
 done
 
 cmd=(ssh -N -T -o ExitOnForwardFailure=yes "${forwards[@]}" "$host")

@@ -69,6 +69,7 @@ devkit edit          # open ~/.devkit in $EDITOR
 devkit status        # show repo/platform status
 devkit doctor        # check required tools and paths
 devkit project-info  # inspect the current project
+devkit pi-sync       # register ~/.devkit as a pi package
 ```
 
 Short zsh aliases:
@@ -108,6 +109,49 @@ tunnel devbox 3000
 tunnel devbox 3000 5173 8000
 tunnel devbox 8080:3000
 tunnel --keep devbox 3000
+```
+
+Manifest-driven tunnels:
+
+```bash
+tunnel fort --manifest .devkit/tunnels.json
+tunnel fort --remote-manifest /home/ian/project/.devkit/tunnels.json
+```
+
+Manifest format:
+
+```json
+{
+  "ports": {
+    "frontend": 54003,
+    "convex_backend": 54000
+  },
+  "urls": {
+    "frontend": "http://localhost:54003"
+  }
+}
+```
+
+Only `ports` and `urls` are used by the tunnel tooling. Keep secrets in separate ignored files.
+
+## Pi extensions
+
+This repo is also a local pi package. To register it on a machine:
+
+```bash
+devkit pi-sync
+```
+
+Then restart pi or run `/reload`. The first extension adds:
+
+```text
+/tunnels
+```
+
+Run `/tunnels` from a project with `.devkit/tunnels.json` to print the client-side command, e.g.:
+
+```bash
+tunnel fort --remote-manifest /home/ian/project/.devkit/tunnels.json
 ```
 
 ## Direct flake commands

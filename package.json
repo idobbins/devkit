@@ -1,0 +1,12 @@
+{
+  "name": "idobbins-devkit-pi",
+  "private": true,
+  "keywords": ["pi-package"],
+  "pi": {
+    "extensions": ["./pi/extensions"]
+  },
+  "peerDependencies": {
+    "@mariozechner/pi-coding-agent": "*",
+    "typebox": "*"
+  }
+}

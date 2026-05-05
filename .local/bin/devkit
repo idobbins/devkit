@@ -16,6 +16,7 @@ Workstation commands:
   doctor             Check required tools and paths
   gc                 Run Nix garbage collection
   path               Print the devkit repo path
+  pi-sync            Register ~/.devkit as a pi package
 
 Project helpers:
   project-info [DIR] Show detected project commands/tools
@@ -153,6 +154,25 @@ gc_nix() {
   nix store gc
 }
 
+pi_sync() {
+  require_repo
+  have jq || die "jq is required for pi-sync"
+
+  settings_dir="$HOME/.pi/agent"
+  settings_file="$settings_dir/settings.json"
+  mkdir -p "$settings_dir"
+  [[ -f "$settings_file" ]] || printf '{}\n' > "$settings_file"
+
+  tmp="$(mktemp)"
+  jq --arg pkg "$DEVKIT_HOME" '
+    .packages = (((.packages // []) | map(select(. != $pkg))) + [$pkg])
+  ' "$settings_file" > "$tmp"
+  mv "$tmp" "$settings_file"
+
+  log "Registered devkit pi package in $settings_file"
+  log "Run /reload in pi, or restart pi, to load extensions"
+}
+
 project_info() {
   dir="${1:-$PWD}"
   [[ -d "$dir" ]] || die "not a directory: $dir"
@@ -199,6 +219,7 @@ case "$cmd" in
   doctor) shift; doctor "$@" ;;
   gc) shift; gc_nix "$@" ;;
   path) shift; printf '%s\n' "$DEVKIT_HOME" ;;
+  pi-sync) shift; pi_sync "$@" ;;
   project-info) shift; project_info "$@" ;;
   -h|--help|help|'') usage ;;
   *) usage >&2; die "unknown command: $cmd" ;;
