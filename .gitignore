@@ -30,3 +30,7 @@ Session.vim
 
 # Logs
 *.log
+
+# Nix build outputs
+result
+result-*

@@ -18,7 +18,18 @@
     };
     initContent = ''
       typeset -U path PATH
-      for dir in "$HOME/.local/bin" "$HOME/bin" "$HOME/.cargo/bin" "$HOME/.bun/bin" "$HOME/.deno/bin" "$HOME/.local/share/pnpm" "/usr/local/bin"; do
+      for dir in \
+        "/etc/profiles/per-user/$USER/bin" \
+        "$HOME/.nix-profile/bin" \
+        "/run/current-system/sw/bin" \
+        "/nix/var/nix/profiles/default/bin" \
+        "$HOME/.local/bin" \
+        "$HOME/bin" \
+        "$HOME/.cargo/bin" \
+        "$HOME/.bun/bin" \
+        "$HOME/.deno/bin" \
+        "$HOME/.local/share/pnpm" \
+        "/usr/local/bin"; do
         [[ -d "$dir" ]] && path=("$dir" $path)
       done
       unset dir
