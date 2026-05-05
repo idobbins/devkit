@@ -87,8 +87,7 @@ if [[ -n "$manifest" || -n "$remote_manifest" ]]; then
     cp "$manifest" "$tmp"
     source_label="$manifest"
   else
-    remote_quoted="$(printf '%q' "$remote_manifest")"
-    ssh "$host" "cat -- $remote_quoted" > "$tmp"
+    ssh "$host" sh -c 'cat -- "$1"' sh "$remote_manifest" > "$tmp"
     source_label="$host:$remote_manifest"
   fi
 
