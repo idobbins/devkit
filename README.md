@@ -49,6 +49,37 @@ AI CLIs are pragmatically installed as npm globals during Home Manager activatio
 - `claude`
 - `codex`
 
+## Daily commands
+
+After bootstrap, use the `devkit` helper instead of remembering Nix commands:
+
+```bash
+devkit update        # git pull ~/.devkit, then apply the right macOS/Linux config
+devkit apply         # apply current config
+devkit edit          # open ~/.devkit in $EDITOR
+devkit status        # show repo/platform status
+devkit doctor        # check required tools and paths
+devkit project-info  # inspect the current project
+```
+
+Short zsh aliases:
+
+```bash
+dku   # devkit update
+dka   # devkit apply
+dke   # devkit edit
+dks   # devkit status
+dkd   # devkit doctor
+```
+
+Jump to projects under `~/dev`:
+
+```bash
+work                 # cd ~/dev
+work notoil          # cd ~/dev/i7/notoil if it exists, then show project info
+work i7/notoil       # cd ~/dev/i7/notoil
+```
+
 ## Local-only config
 
 These remain outside the repo:
@@ -71,6 +102,8 @@ tunnel --keep devbox 3000
 ```
 
 ## Direct flake commands
+
+Normally use `devkit apply`. If you need the raw commands:
 
 ```bash
 home-manager switch --flake ~/.devkit#linux --impure

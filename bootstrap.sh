@@ -58,7 +58,7 @@ if [[ ! -f "$HOME/.ssh/id_ed25519" ]]; then
   ssh-keygen -t ed25519 -N "" -f "$HOME/.ssh/id_ed25519"
 fi
 
-printf '\nNext auth steps:\n  gh auth login\n  pi /login\n  claude login\n  codex login\n\nSSH public key:\n'
+printf '\nNext auth steps:\n  gh auth login\n  pi /login\n  claude login\n  codex login\n\nDaily devkit commands:\n  devkit update   # pull and apply this config\n  devkit edit     # edit ~/.devkit\n  work notoil     # jump to ~/dev/i7/notoil when using zsh\n\nSSH public key:\n'
 cat "$HOME/.ssh/id_ed25519.pub"
 
 if command -v tailscale >/dev/null 2>&1; then

@@ -1,0 +1,177 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DEVKIT_HOME="${DEVKIT_HOME:-$HOME/.devkit}"
+DEV_HOME="${DEV_HOME:-$HOME/dev}"
+
+usage() {
+  cat <<'EOF'
+Usage: devkit COMMAND [ARGS]
+
+Workstation commands:
+  apply              Apply this machine's Nix config
+  update             Pull ~/.devkit and apply it
+  edit               Open ~/.devkit in $EDITOR
+  status             Show devkit repo/platform status
+  doctor             Check required tools and paths
+  gc                 Run Nix garbage collection
+  path               Print the devkit repo path
+
+Project helpers:
+  project-info [DIR] Show detected project commands/tools
+
+Examples:
+  devkit update
+  devkit apply
+  devkit project-info ~/dev/i7/notoil
+EOF
+}
+
+log() { printf '==> %s\n' "$*"; }
+warn() { printf 'WARN: %s\n' "$*" >&2; }
+die() { printf 'ERROR: %s\n' "$*" >&2; exit 1; }
+have() { command -v "$1" >/dev/null 2>&1; }
+
+require_repo() {
+  [[ -d "$DEVKIT_HOME/.git" ]] || die "devkit repo not found at $DEVKIT_HOME"
+}
+
+target_name() {
+  case "$(uname -s)" in
+    Darwin) printf 'macos' ;;
+    Linux) printf 'linux' ;;
+    *) die "unsupported OS: $(uname -s)" ;;
+  esac
+}
+
+apply_config() {
+  require_repo
+  have nix || die "nix is not installed or not on PATH"
+
+  target="$(target_name)"
+  case "$target" in
+    macos)
+      log "Applying nix-darwin config: $DEVKIT_HOME#macos"
+      nix run nix-darwin -- switch --flake "$DEVKIT_HOME#macos" --impure
+      ;;
+    linux)
+      log "Applying Home Manager config: $DEVKIT_HOME#linux"
+      nix run home-manager -- switch --flake "$DEVKIT_HOME#linux" --impure
+      ;;
+  esac
+}
+
+update_config() {
+  require_repo
+  log "Updating $DEVKIT_HOME"
+  git -C "$DEVKIT_HOME" pull --ff-only
+  apply_config
+}
+
+edit_config() {
+  require_repo
+  editor="${EDITOR:-nvim}"
+  have "$editor" || editor="vi"
+  exec "$editor" "$DEVKIT_HOME"
+}
+
+status_config() {
+  require_repo
+  printf 'Devkit: %s\n' "$DEVKIT_HOME"
+  printf 'Target: %s\n' "$(target_name)"
+  printf 'Nix:    '
+  if have nix; then nix --version; else printf 'missing\n'; fi
+  printf '\nRepo status:\n'
+  git -C "$DEVKIT_HOME" status --short --branch
+  printf '\nLast commit:\n'
+  git -C "$DEVKIT_HOME" log -1 --oneline
+}
+
+doctor() {
+  failures=0
+  check() {
+    if eval "$2" >/dev/null 2>&1; then
+      printf '✓ %s\n' "$1"
+    else
+      printf '✗ %s\n' "$1"
+      failures=$((failures + 1))
+    fi
+  }
+
+  check "devkit repo exists at $DEVKIT_HOME" "test -d '$DEVKIT_HOME/.git'"
+  check "git is available" "command -v git"
+  check "nix is available" "command -v nix"
+  check "flake.nix exists" "test -f '$DEVKIT_HOME/flake.nix'"
+
+  case "$(uname -s)" in
+    Darwin) check "macOS target is selected" "true" ;;
+    Linux) check "Linux target is selected" "true" ;;
+    *) check "supported OS" "false" ;;
+  esac
+
+  if [[ -d "$DEVKIT_HOME/.git" ]]; then
+    if [[ -n "$(git -C "$DEVKIT_HOME" status --porcelain)" ]]; then
+      warn "devkit repo has local changes"
+    else
+      printf '✓ devkit repo is clean\n'
+    fi
+  fi
+
+  [[ "$failures" -eq 0 ]] || exit 1
+}
+
+gc_nix() {
+  have nix || die "nix is not installed or not on PATH"
+  nix store gc
+}
+
+project_info() {
+  dir="${1:-$PWD}"
+  [[ -d "$dir" ]] || die "not a directory: $dir"
+
+  printf 'Project: %s\n' "$dir"
+
+  if git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    printf 'Git:     '
+    git -C "$dir" status --short --branch | head -1
+  fi
+
+  if [[ -f "$dir/.envrc" ]]; then
+    printf 'Env:     .envrc present; run `direnv allow` once if it is blocked\n'
+  fi
+
+  if [[ -f "$dir/flake.nix" ]]; then
+    printf 'Nix:     flake.nix present; use `nix develop` or direnv with `use flake`\n'
+  fi
+
+  if [[ -f "$dir/package.json" ]]; then
+    printf 'Node:    package.json present\n'
+    if have jq; then
+      scripts="$(jq -r '.scripts // {} | keys | join(", ")' "$dir/package.json" 2>/dev/null || true)"
+      [[ -n "$scripts" ]] && printf 'Scripts: %s\n' "$scripts"
+    else
+      printf 'Try:     pnpm install && pnpm dev\n'
+    fi
+  fi
+
+  [[ -f "$dir/pyproject.toml" ]] && printf 'Python:  pyproject.toml present; try `uv sync` or `uv run ...`\n'
+  [[ -f "$dir/requirements.txt" ]] && printf 'Python:  requirements.txt present; try `uv venv && uv pip install -r requirements.txt`\n'
+  [[ -f "$dir/Cargo.toml" ]] && printf 'Rust:    Cargo.toml present; try `cargo build` or `cargo run`\n'
+  [[ -f "$dir/Makefile" || -f "$dir/makefile" ]] && printf 'Make:    Makefile present; try `make help` or `make`\n'
+
+  return 0
+}
+
+cmd="${1:-}"
+case "$cmd" in
+  apply) shift; apply_config "$@" ;;
+  update) shift; update_config "$@" ;;
+  edit) shift; edit_config "$@" ;;
+  status) shift; status_config "$@" ;;
+  doctor) shift; doctor "$@" ;;
+  gc) shift; gc_nix "$@" ;;
+  path) shift; printf '%s\n' "$DEVKIT_HOME" ;;
+  project-info) shift; project_info "$@" ;;
+  -h|--help|help|'') usage ;;
+  *) usage >&2; die "unknown command: $cmd" ;;
+esac

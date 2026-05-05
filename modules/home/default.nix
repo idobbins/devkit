@@ -6,6 +6,7 @@
     ./git.nix
     ./ssh.nix
     ./tunnel.nix
+    ./devkit.nix
     ./neovim.nix
     ./ai.nix
   ];
