@@ -47,7 +47,12 @@ else
 fi
 
 if [[ "$os" == "Darwin" ]]; then
-  nix run nix-darwin -- switch --flake "$DEST#macos" --impure
+  nix_bin="$(command -v nix)"
+  if [[ ${EUID:-$(id -u)} -eq 0 ]]; then
+    "$nix_bin" run nix-darwin -- switch --flake "$DEST#macos" --impure
+  else
+    sudo env HOME="$HOME" USER="$USER" DEVKIT_HOME="$DEST" "$nix_bin" run nix-darwin -- switch --flake "$DEST#macos" --impure
+  fi
 else
   nix run home-manager -- switch --flake "$DEST#linux" --impure
 fi
