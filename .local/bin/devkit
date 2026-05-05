@@ -56,7 +56,7 @@ apply_config() {
         nix run nix-darwin -- switch --flake "$DEVKIT_HOME#macos" --impure
       else
         nix_bin="$(command -v nix)"
-        sudo env HOME="$HOME" USER="$USER" DEVKIT_HOME="$DEVKIT_HOME" "$nix_bin" run nix-darwin -- switch --flake "$DEVKIT_HOME#macos" --impure
+        sudo env USER="$USER" LOGNAME="$USER" DEVKIT_USER_HOME="$HOME" DEVKIT_HOME="$DEVKIT_HOME" "$nix_bin" run nix-darwin -- switch --flake "$DEVKIT_HOME#macos" --impure
       fi
       ;;
     linux)

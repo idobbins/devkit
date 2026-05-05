@@ -22,9 +22,10 @@
 
   outputs = inputs@{ self, nixpkgs, home-manager, nix-darwin, nixvim, ... }:
     let
-      username = let env = builtins.getEnv "USER"; in if env == "" then "idobbins" else env;
-      linuxHome = let env = builtins.getEnv "HOME"; in if env == "" then "/home/${username}" else env;
-      darwinHome = let env = builtins.getEnv "HOME"; in if env == "" then "/Users/${username}" else env;
+      username = let env = builtins.getEnv "USER"; in if env == "" || env == "root" then "idobbins" else env;
+      explicitHome = builtins.getEnv "DEVKIT_USER_HOME";
+      linuxHome = if explicitHome != "" then explicitHome else let env = builtins.getEnv "HOME"; in if env == "" || env == "/var/root" then "/home/${username}" else env;
+      darwinHome = if explicitHome != "" then explicitHome else let env = builtins.getEnv "HOME"; in if env == "" || env == "/var/root" then "/Users/${username}" else env;
       currentSystem = let env = builtins.getEnv "NIX_SYSTEM"; in if env != "" then env else builtins.currentSystem or "aarch64-darwin";
       linuxSystem = if currentSystem == "x86_64-linux" || currentSystem == "aarch64-linux" then currentSystem else "x86_64-linux";
       darwinSystem = if currentSystem == "x86_64-darwin" || currentSystem == "aarch64-darwin" then currentSystem else "aarch64-darwin";
@@ -32,7 +33,7 @@
       homeConfigurations.linux = home-manager.lib.homeManagerConfiguration {
         pkgs = import nixpkgs { system = linuxSystem; config.allowUnfree = true; };
         extraSpecialArgs = { inherit inputs username; homeDirectory = linuxHome; };
-        modules = [ nixvim.homeManagerModules.nixvim ./hosts/linux.nix ];
+        modules = [ nixvim.homeModules.nixvim ./hosts/linux.nix ];
       };
 
       darwinConfigurations.macos = nix-darwin.lib.darwinSystem {

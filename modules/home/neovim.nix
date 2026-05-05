@@ -7,9 +7,19 @@
     opts = { number = true; relativenumber = true; expandtab = true; shiftwidth = 2; tabstop = 2; termguicolors = true; };
     globals.mapleader = " ";
     plugins = {
+      web-devicons.enable = true;
       telescope = { enable = true; extensions.fzf-native.enable = true; };
       treesitter = { enable = true; settings.highlight.enable = true; };
-      lsp = { enable = true; servers = { nil_ls.enable = true; lua_ls.enable = true; ts_ls.enable = true; pyright.enable = true; rust_analyzer.enable = true; }; };
+      lsp = {
+        enable = true;
+        servers = {
+          nil_ls.enable = true;
+          lua_ls.enable = true;
+          ts_ls.enable = true;
+          pyright.enable = true;
+          rust_analyzer = { enable = true; installCargo = false; installRustc = false; };
+        };
+      };
       blink-cmp.enable = true;
       gitsigns.enable = true;
     };

@@ -2,7 +2,6 @@
 {
   programs.git = {
     enable = true;
-    userName = "Isaac Dobbins";
     lfs.enable = true;
     ignores = [
       ".DS_Store"
@@ -21,7 +20,8 @@
       "*.local"
       ".localrc"
     ];
-    extraConfig = {
+    settings = {
+      user.name = "Isaac Dobbins";
       core.editor = "nvim";
       init.defaultBranch = "main";
       pull.rebase = false;
