@@ -49,7 +49,7 @@ fi
 if [[ "$os" == "Darwin" ]]; then
   nix_bin="$(command -v nix)"
   if [[ ${EUID:-$(id -u)} -eq 0 ]]; then
-    "$nix_bin" run nix-darwin -- switch --flake "$DEST#macos" --impure
+    "$nix_bin" --option nix-path "" run nix-darwin -- switch --flake "$DEST#macos" --impure
   else
     sudo env \
       USER="$USER" \
@@ -62,7 +62,7 @@ if [[ "$os" == "Darwin" ]]; then
       "$nix_bin" --option nix-path "" run nix-darwin -- switch --flake "$DEST#macos" --impure
   fi
 else
-  nix run home-manager -- switch --flake "$DEST#linux" --impure
+  nix --option nix-path "" run home-manager -- switch --flake "$DEST#linux" --impure
 fi
 
 mkdir -p "$HOME/.ssh"

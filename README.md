@@ -41,7 +41,7 @@ Skip OS upgrades:
 
 ## Managed by Nix
 
-Core tools include Git/GitHub CLI, Neovim, ripgrep/fd/fzf, jq/yq, bat/eza, tmux, direnv, curl/wget/rsync, gnupg/openssh/autossh, cmake/make/pkg-config, uv, Node 24/pnpm, bun, deno, rustup, dotnet/opam/zig, AWS/SAM/gcloud/Databricks CLIs, PostgreSQL/MongoDB tools, and ffmpeg/yt-dlp. GUI apps are intentionally not managed here, and Homebrew is intentionally not used.
+Core tools include Git/GitHub CLI, Neovim, ripgrep/fd/fzf, jq/yq, bat/eza, tmux, direnv, curl/wget/rsync, gnupg/openssh, coreutils, and file. Language runtimes, cloud CLIs, databases, and media tools are intentionally left to project-local shells or local-only config. GUI apps are intentionally not managed here, and Homebrew is intentionally not used.
 
 AI CLIs are installed through Nix/Home Manager:
 
@@ -106,8 +106,8 @@ tunnel --keep devbox 3000
 Normally use `devkit apply`. If you need the raw commands:
 
 ```bash
-home-manager switch --flake ~/.devkit#linux --impure
-darwin-rebuild switch --flake ~/.devkit#macos --impure
+nix --option nix-path "" run home-manager -- switch --flake ~/.devkit#linux --impure
+nix --option nix-path "" run nix-darwin -- switch --flake ~/.devkit#macos --impure
 ```
 
 Determinate owns Nix itself, so nix-darwin is configured with `nix.enable = false`.

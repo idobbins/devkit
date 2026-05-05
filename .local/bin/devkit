@@ -53,7 +53,7 @@ apply_config() {
     macos)
       log "Applying nix-darwin config: $DEVKIT_HOME#macos"
       if [[ "${EUID:-$(id -u)}" -eq 0 ]]; then
-        nix run nix-darwin -- switch --flake "$DEVKIT_HOME#macos" --impure
+        nix --option nix-path "" run nix-darwin -- switch --flake "$DEVKIT_HOME#macos" --impure
       else
         nix_bin="$(command -v nix)"
         sudo env \
@@ -69,7 +69,7 @@ apply_config() {
       ;;
     linux)
       log "Applying Home Manager config: $DEVKIT_HOME#linux"
-      nix run home-manager -- switch --flake "$DEVKIT_HOME#linux" --impure
+      nix --option nix-path "" run home-manager -- switch --flake "$DEVKIT_HOME#linux" --impure
       ;;
   esac
 }
