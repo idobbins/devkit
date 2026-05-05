@@ -3,8 +3,9 @@
   programs.nixvim = {
     enable = true;
     defaultEditor = true;
+    colorscheme = "github_light";
     colorschemes.github-theme.enable = true;
-    opts = { number = true; relativenumber = true; expandtab = true; shiftwidth = 2; tabstop = 2; termguicolors = true; };
+    opts = { number = true; relativenumber = true; expandtab = true; shiftwidth = 2; tabstop = 2; termguicolors = true; background = "light"; };
     globals.mapleader = " ";
     plugins = {
       web-devicons.enable = true;
