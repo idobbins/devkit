@@ -56,7 +56,15 @@ apply_config() {
         nix run nix-darwin -- switch --flake "$DEVKIT_HOME#macos" --impure
       else
         nix_bin="$(command -v nix)"
-        sudo env USER="$USER" LOGNAME="$USER" DEVKIT_USER_HOME="$HOME" DEVKIT_HOME="$DEVKIT_HOME" "$nix_bin" run nix-darwin -- switch --flake "$DEVKIT_HOME#macos" --impure
+        sudo env \
+          USER="$USER" \
+          LOGNAME="$USER" \
+          HOME=/var/root \
+          XDG_CACHE_HOME=/var/root/.cache \
+          NIX_PATH= \
+          DEVKIT_USER_HOME="$HOME" \
+          DEVKIT_HOME="$DEVKIT_HOME" \
+          "$nix_bin" --option nix-path "" run nix-darwin -- switch --flake "$DEVKIT_HOME#macos" --impure
       fi
       ;;
     linux)
@@ -142,11 +150,11 @@ project_info() {
   fi
 
   if [[ -f "$dir/.envrc" ]]; then
-    printf 'Env:     .envrc present; run `direnv allow` once if it is blocked\n'
+    printf '%s\n' "Env:     .envrc present; run \`direnv allow\` once if it is blocked"
   fi
 
   if [[ -f "$dir/flake.nix" ]]; then
-    printf 'Nix:     flake.nix present; use `nix develop` or direnv with `use flake`\n'
+    printf '%s\n' "Nix:     flake.nix present; use \`nix develop\` or direnv with \`use flake\`"
   fi
 
   if [[ -f "$dir/package.json" ]]; then
@@ -159,10 +167,10 @@ project_info() {
     fi
   fi
 
-  [[ -f "$dir/pyproject.toml" ]] && printf 'Python:  pyproject.toml present; try `uv sync` or `uv run ...`\n'
-  [[ -f "$dir/requirements.txt" ]] && printf 'Python:  requirements.txt present; try `uv venv && uv pip install -r requirements.txt`\n'
-  [[ -f "$dir/Cargo.toml" ]] && printf 'Rust:    Cargo.toml present; try `cargo build` or `cargo run`\n'
-  [[ -f "$dir/Makefile" || -f "$dir/makefile" ]] && printf 'Make:    Makefile present; try `make help` or `make`\n'
+  [[ -f "$dir/pyproject.toml" ]] && printf '%s\n' "Python:  pyproject.toml present; try \`uv sync\` or \`uv run ...\`"
+  [[ -f "$dir/requirements.txt" ]] && printf '%s\n' "Python:  requirements.txt present; try \`uv venv && uv pip install -r requirements.txt\`"
+  [[ -f "$dir/Cargo.toml" ]] && printf '%s\n' "Rust:    Cargo.toml present; try \`cargo build\` or \`cargo run\`"
+  [[ -f "$dir/Makefile" || -f "$dir/makefile" ]] && printf '%s\n' "Make:    Makefile present; try \`make help\` or \`make\`"
 
   return 0
 }
