@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }:
+{ pkgs, ... }:
 {
   home.packages = with pkgs; [
     git git-lfs gh git-crypt git-filter-repo
@@ -10,7 +10,5 @@
     postgresql_16 dbmate mongodb-tools
     ffmpeg yt-dlp
     opencode graphite-cli python312Packages.huggingface-hub
-  ] ++ lib.optionals pkgs.stdenv.isDarwin [
-    ghostty orbstack postman vscode obs-studio ngrok mactop
   ];
 }
