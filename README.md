@@ -43,7 +43,7 @@ Skip OS upgrades:
 
 Core tools include Git/GitHub CLI, Neovim, ripgrep/fd/fzf, jq/yq, bat/eza, tmux, direnv, curl/wget/rsync, gnupg/openssh/autossh, cmake/make/pkg-config, uv, Node 24/pnpm, bun, deno, rustup, dotnet/opam/zig, AWS/SAM/gcloud/Databricks CLIs, PostgreSQL/MongoDB tools, and ffmpeg/yt-dlp. GUI apps are intentionally not managed here, and Homebrew is intentionally not used.
 
-AI CLIs are pragmatically installed as npm globals during Home Manager activation:
+AI CLIs are installed through Nix/Home Manager:
 
 - `pi`
 - `claude`
