@@ -10,6 +10,7 @@
     ./neovim.nix
     ./ai.nix
     ./cmux.nix
+    ./pi.nix
   ];
 
   programs.home-manager.enable = true;
