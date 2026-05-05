@@ -41,7 +41,7 @@ Skip OS upgrades:
 
 ## Managed by Nix
 
-Core tools include Git/GitHub CLI, Neovim, ripgrep/fd/fzf, jq/yq, bat/eza, tmux, direnv, curl/wget/rsync, gnupg/openssh/autossh, cmake/make/pkg-config, uv, Node 24/pnpm, bun, deno, rustup, AWS CLI, and PostgreSQL client tools.
+Core tools include Git/GitHub CLI, Neovim, ripgrep/fd/fzf, jq/yq, bat/eza, tmux, direnv, curl/wget/rsync, gnupg/openssh/autossh, cmake/make/pkg-config, uv, Node 24/pnpm, bun, deno, rustup, dotnet/opam/zig, AWS/SAM/gcloud/Databricks CLIs, PostgreSQL/MongoDB tools, ffmpeg/yt-dlp, and selected macOS apps. Homebrew is intentionally not used.
 
 AI CLIs are pragmatically installed as npm globals during Home Manager activation:
 

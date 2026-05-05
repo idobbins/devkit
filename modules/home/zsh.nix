@@ -18,7 +18,7 @@
     };
     initContent = ''
       typeset -U path PATH
-      for dir in "$HOME/.local/bin" "$HOME/bin" "$HOME/.cargo/bin" "$HOME/.bun/bin" "$HOME/.deno/bin" "$HOME/Library/pnpm" "$HOME/.local/share/pnpm" "/opt/homebrew/bin" "/usr/local/bin"; do
+      for dir in "$HOME/.local/bin" "$HOME/bin" "$HOME/.cargo/bin" "$HOME/.bun/bin" "$HOME/.deno/bin" "$HOME/.local/share/pnpm" "/usr/local/bin"; do
         [[ -d "$dir" ]] && path=("$dir" $path)
       done
       unset dir

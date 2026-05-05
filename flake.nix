@@ -18,11 +18,9 @@
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
   };
 
-  outputs = inputs@{ self, nixpkgs, home-manager, nix-darwin, nixvim, nix-homebrew, ... }:
+  outputs = inputs@{ self, nixpkgs, home-manager, nix-darwin, nixvim, ... }:
     let
       username = let env = builtins.getEnv "USER"; in if env == "" then "idobbins" else env;
       linuxHome = let env = builtins.getEnv "HOME"; in if env == "" then "/home/${username}" else env;
