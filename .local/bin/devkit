@@ -52,7 +52,12 @@ apply_config() {
   case "$target" in
     macos)
       log "Applying nix-darwin config: $DEVKIT_HOME#macos"
-      nix run nix-darwin -- switch --flake "$DEVKIT_HOME#macos" --impure
+      if [[ "${EUID:-$(id -u)}" -eq 0 ]]; then
+        nix run nix-darwin -- switch --flake "$DEVKIT_HOME#macos" --impure
+      else
+        nix_bin="$(command -v nix)"
+        sudo env HOME="$HOME" USER="$USER" DEVKIT_HOME="$DEVKIT_HOME" "$nix_bin" run nix-darwin -- switch --flake "$DEVKIT_HOME#macos" --impure
+      fi
       ;;
     linux)
       log "Applying Home Manager config: $DEVKIT_HOME#linux"
