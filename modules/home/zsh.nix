@@ -17,23 +17,6 @@
       ll = "eza -la --group-directories-first --git";
     };
     initContent = ''
-      typeset -U path PATH
-      for dir in \
-        "/etc/profiles/per-user/$USER/bin" \
-        "$HOME/.nix-profile/bin" \
-        "/run/current-system/sw/bin" \
-        "/nix/var/nix/profiles/default/bin" \
-        "$HOME/.local/bin" \
-        "$HOME/bin" \
-        "$HOME/.cargo/bin" \
-        "$HOME/.bun/bin" \
-        "$HOME/.deno/bin" \
-        "$HOME/.local/share/pnpm" \
-        "/usr/local/bin"; do
-        [[ -d "$dir" ]] && path=("$dir" $path)
-      done
-      unset dir
-
       setopt prompt_subst auto_cd interactive_comments hist_ignore_dups hist_ignore_space share_history
       export EDITOR="nvim" VISUAL="nvim" PAGER="less" LESS="-R"
 
