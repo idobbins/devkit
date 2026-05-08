@@ -12,4 +12,12 @@
       }
     }
   '';
+
+  home.file."Library/Application Support/com.cmuxterm.app/config.ghostty".text = ''
+    font-family = "Geist Mono"
+
+    # cmux themes start
+    theme = light:Ayu Light,dark:Ayu Light
+    # cmux themes end
+  '';
 }

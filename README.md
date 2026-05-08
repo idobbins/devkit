@@ -57,6 +57,7 @@ AI CLIs are installed through Nix/Home Manager:
 - `pi`
 - `claude`
 - `codex`
+- `amp`
 
 ## Daily commands
 
